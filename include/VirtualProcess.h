@@ -1,4 +1,7 @@
-#include "../define.h"
+#ifndef VIRTUAL_PROCESS_H
+#define VIRTUAL_PROCESS_H
+#include "define.h"
+#include "User.h"
 
 /**VitualProcess类说明：
  * 
@@ -6,15 +9,20 @@
  * 所以我们这里创建这样一个虚假的进程结构，里面存放的数据能够支持打开文件结构。
  * 
  */
-struct User
-{
-};
 
 class VirtualProcess
 {
   private:
+    User defaultUser;
+    static VirtualProcess instance;
   public:
-  
+    VirtualProcess();
+    ~VirtualProcess();
+
+
+
+    static VirtualProcess& Instance();  //单例模式，记得考虑线程安全
+
     /* 根据系统调用参数uid设置有效用户ID，真实用户ID，进程用户ID(p_uid) */
     void Setuid();
 
@@ -32,4 +40,9 @@ class VirtualProcess
 
     /* 检查当前用户是否是超级用户 */
     bool SUser();
-}
+
+    /* 获取User结构 */
+    User getUser();
+};
+
+#endif
