@@ -1,6 +1,7 @@
 #ifndef SHELL_H
 #define SHELL_H
 #include "define.h"
+#include "Logcat.h"
 
 #define TTY_BUFFER_SIZE 4096
 #define MAX_CMD_LEN 4096
@@ -13,10 +14,18 @@ class Shell
   private:
     char tty_buffer[TTY_BUFFER_SIZE];  
     char split_cmd[MAX_PARAM_NUM][MAX_SINGLE_PARAM_LEN]{};
+    int param_num=0;
+    char const * TAG;
   public:
+
+    Shell();
+    ~Shell();
     int readUserInput();
-    int parseCmd();
+    void parseCmd();
     INSTRUCT getInstType();
+    char *getInstStr();
+    char *getParam(int i);
+
     //shell调用的功能
       //显式调用
     void mount();//挂载磁盘
@@ -28,7 +37,7 @@ class Shell
     void help();
     void version();
     void man();
-    void exit();
+    void mexit();
       //隐式调用
     void creat();
     void open();

@@ -33,7 +33,7 @@ OpenFiles::~OpenFiles()
 int OpenFiles::AllocFreeSlot()
 {
 	int i;
-	User& u = VirtualProcess::Instance().getUser();
+	 const User& u = VirtualProcess::Instance().getUser();
 	
 	for(i = 0; i < OpenFiles::NOFILES; i++)
 	{
@@ -54,19 +54,20 @@ int OpenFiles::AllocFreeSlot()
 File* OpenFiles::GetF(int fd)
 {
 	File* pFile;
-	User& u = Kernel::Instance().GetUser();
+	const User& u = VirtualProcess::Instance().getUser();
+	
 	
 	/* 如果打开文件描述符的值超出了范围 */
 	if(fd < 0 || fd >= OpenFiles::NOFILES)
 	{
-		u.u_error = User::EBADF;
+		// u.u_error = User::EBADF;
 		return NULL;
 	}
 
 	pFile = this->ProcessOpenFileTable[fd];
 	if(pFile == NULL)
 	{
-		u.u_error = User::EBADF;
+		// u.u_error = User::EBADF;
 	}
 
 	return pFile;	/* 即使pFile==NULL也返回它，由调用GetF的函数来判断返回值 */

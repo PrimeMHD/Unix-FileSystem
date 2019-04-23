@@ -1,57 +1,218 @@
-#include "Shell.h"
+#include "../include/Shell.h"
 
-void Shell::help(){
+void Shell::help()
+{
+
     system("cat help");
 }
 
+int Shell::readUserInput()
+{
 
-int Shell::readUserInput(){
-    //Step1:获取用户输入放到缓冲区
-    std::cin.getline(tty_buffer,MAX_CMD_LEN,'\n');
+    while (true)
+    {
+        //Step0:
+        //显示命令提示符
+        //TODO 
 
-    //Step2:以空格、tab为界，分解命令参数，存到Shell::split_cmd中
-    //TODO
+        //Step1:获取用户输入放到缓冲区
+
+        std::cin.getline(tty_buffer, MAX_CMD_LEN, '\n');
 
 
+        //Step2:先将tab转换为space
+        for(char *checker=strrchr(tty_buffer,'\t');checker!=NULL;checker=strrchr(checker,'\t')){
+            *checker=' ';
+        }
+
+
+        //Step3:以空格、tab为界，分解命令参数，存到Shell::split_cmd中
+        char *dupl_tty_buffer=strdup(tty_buffer);
+        /**
+         * NOTE strdup创建的字符串是在堆上的，需要自己delete释放
+         *@comment:这里拷贝一份tty_buffer的副本，因为后面用strtok函数的时候，会改变参数的字符串
+         *当然也不是非要调用strtok，但是方便啊
+         * 
+         */
+
+        //splitCmd先清空一下
+        memset(split_cmd,0x0,sizeof(split_cmd));
+        int cmd_param_seq=0;
+        for(char *p=strtok(dupl_tty_buffer," ");p!=nullptr;p=strtok(NULL," "),cmd_param_seq++){
+           strcpy(split_cmd[cmd_param_seq],p);
+        }
+        param_num=cmd_param_seq;
+        #ifdef IS_DEBUG
+        for(int i=0;i<param_num;i++){
+            std::cout<<"看一下刚输入的参数："<<split_cmd[i]<<' ';
+        }
+        std::cout<<std::endl;
+        #endif
+        //TODO
+        
+
+
+        //Step4:解析执行指令
+        parseCmd();
+        delete dupl_tty_buffer;
+    }
 }
 
-int Shell::parseCmd(){
+void Shell::parseCmd()
+{
     switch (getInstType())
     {
-        case MOUNT:
-            /* code */
-            break;
-        case UNMOUNT:
-            break;
-        case FORMAT:
-            break;
-        case CD:
-            break;
-        case LS:
-            break;
-        case RM:
-            break;
-        case MKDIR:
-            break;
-        case TOUCH:
-            break;
-        case CLEAR:
-            break;
-        case HELP:
-            break;
-        case EXIT:
-            break;
-        case VERSION:
-            break;
-        default:
-            break;
+    case MOUNT:
+        mount();
+        break;
+    case UNMOUNT:
+        unmount();
+        break;
+    case FORMAT:
+        format();
+        break;
+    case CD:
+        // cd();
+        break;
+    case LS:
+        // ls();
+        break;
+    case RM:
+        // rm();
+        break;
+    case MKDIR:
+        mkdir();
+        break;
+    case TOUCH:
+        touch();
+        break;
+    case CLEAR:
+        //clear();
+        break;
+    case HELP:
+        help();
+        break;
+    case EXIT:
+        mexit();
+        break;
+    case VERSION:
+        version();
+        break;
+    default:
+        printf("CMD NOT SUPPORTED!\n");
+        break;
     }
+}
+
+/**
+ * @comment:实际上是做字符串到枚举类型的转化，为了switch case
+ */
+INSTRUCT Shell::getInstType()
+{
+    char *instStr=getInstStr();
+#ifdef IS_DEBUG
+    Logcat::log(TAG,"命令行命令字为:");
+    Logcat::log(TAG,instStr);
+
+#endif
+    //为什么从1开始
+    for(int i=1;i<INST_NUM;i++){
+        //这里要加感叹号，注意strcmp在相等时返回的是0
+        if(!strcmp(instructStr[i],instStr)){
+
+#ifdef IS_DEBUG
+            //std::cout<<INSTRUCT(i)<<std::endl;
+#endif
+            return INSTRUCT(i-1);
+        }
+    }
+    return ERROR_INST;
 }
 
 
 /**
- * comment:实际上是做字符串到枚举类型的转化，为了switch case
+ * @comment:命令缓冲区→命令参数字符数组→第一个参数得到命令字符串
+ * 此函数的功能就是读出第一个字符串，亦即InstStr
  */
-INSTRUCT Shell::getInstType(){
+char* Shell::getInstStr(){
+    return split_cmd[0];
+    //很简单，数组首个就是命令关键字
+}
 
+/**
+ * @comment:这个是getInstStr更通用的情况
+ */
+char* Shell::getParam(int i){
+    return split_cmd[i];
+}
+
+
+
+void Shell::mount(){
+    Logcat::log(TAG,"MOUNT EXEC");
+}
+
+void Shell::unmount(){
+    Logcat::log(TAG,"unmount EXEC");
+
+}
+void Shell::format(){
+    Logcat::log(TAG,"format EXEC");
+    
+}
+void Shell::mkdir(){
+    Logcat::log(TAG,"mkdir EXEC");
+
+}
+void Shell::cat(){
+    Logcat::log(TAG,"cat EXEC");
+
+}    
+void Shell::touch(){
+    Logcat::log(TAG,"touch EXEC");
+
+}
+
+void Shell::version(){
+    Logcat::log(TAG,"version EXEC");
+
+}
+void Shell::man(){
+    Logcat::log(TAG,"man EXEC");
+
+}
+void Shell::mexit(){
+    Logcat::log(TAG,"exit EXEC");
+
+}
+      //隐式调用
+void Shell::creat(){
+    Logcat::log(TAG,"creat EXEC");
+
+}
+void Shell::open(){
+    Logcat::log(TAG,"open EXEC");
+
+}
+void Shell::close(){
+    Logcat::log(TAG,"close EXEC");
+
+}
+void Shell::read(){
+    Logcat::log(TAG,"read EXEC");
+
+}
+void Shell::write(){
+    Logcat::log(TAG,"write EXEC");
+
+}
+void Shell::lseek(){
+    Logcat::log(TAG,"lseek EXEC");
+
+}
+Shell::Shell(){
+    TAG=strdup("Shell");
+}
+Shell::~Shell(){
+    delete TAG;
 }

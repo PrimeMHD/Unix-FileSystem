@@ -1,4 +1,4 @@
-#include "VirtualProcess.h"
+#include "../include/VirtualProcess.h"
 
 
 VirtualProcess VirtualProcess::instance;
@@ -7,6 +7,12 @@ VirtualProcess VirtualProcess::instance;
 VirtualProcess::VirtualProcess(){
     //TODO 需要初始化VirtualProcess
 }
+
+
+VirtualProcess::~VirtualProcess(){
+    //TODO 需要初始化VirtualProcess
+}
+
 
 
 VirtualProcess&  VirtualProcess::Instance(){
