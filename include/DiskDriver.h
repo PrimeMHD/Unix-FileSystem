@@ -1,7 +1,7 @@
 #ifndef DISK_DRIVER_H
 #define DISK_DRIVER_H
-#include "include/define.h"
-#include "include/DiskBlock.h"
+#include "define.h"
+#include "DiskBlock.h"
 
 /**
  * DiskDriver类：

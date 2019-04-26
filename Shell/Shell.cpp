@@ -150,6 +150,16 @@ char* Shell::getParam(int i){
 
 void Shell::mount(){
     Logcat::log(TAG,"MOUNT EXEC");
+    /**
+     * 装载磁盘的最上层命令调用函数：
+     * 硬盘装载的步骤：
+     * ①内存inodeCache初始化
+     * ②DiskDriver打开虚拟磁盘img，mmap，进入就绪状态
+     * ③装载SuperBlock到VFS的SuperBlock缓存
+     * 
+     *  */
+    bounded_VFS->
+
 }
 
 void Shell::unmount(){
@@ -215,4 +225,8 @@ Shell::Shell(){
 }
 Shell::~Shell(){
     delete TAG;
+}
+
+void Shell::setVFS(VFS* vfs){
+    bounded_VFS=vfs;
 }

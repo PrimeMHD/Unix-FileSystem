@@ -1,6 +1,7 @@
+#ifndef DISKBLOCK_H
+#define DISKBLOCK_H
+
 #include "define.h"
-
-
 class DiskBlock{
   private:
     uint8_t content[DISK_BLOCK_SIZE];
@@ -9,3 +10,5 @@ class DiskBlock{
     
 
 };
+
+#endif
