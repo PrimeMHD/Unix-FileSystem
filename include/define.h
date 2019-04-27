@@ -9,6 +9,8 @@
 #include <fcntl.h> //open系统调用
 #include <unistd.h> //lseek函数
 #include <sys/mman.h>  //mmap函数
+#include <stdlib.h>    //随机数
+#include <time.h>      //随机数种子要用
 
 //const和define的区别》
 #define DISK_BLOCK_SIZE 4096

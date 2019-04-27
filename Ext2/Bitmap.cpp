@@ -128,7 +128,7 @@ return ret;
  * 
  */
 int Bitmap::getAFreeBitNum(){
-  int ret=0;
+  int ret=-1;
   for(int i=0;i<DISK_SIZE/DISK_BLOCK_SIZE;i++){
       if(bitmap[i]!=0xFF){//存在空位
         if(bitmap[i]&0x01){
