@@ -20,6 +20,9 @@
 #define BUFFER_CACHE_NUM 20
 #define MAX_INODE_NUM 4096  //这个数是我随便起的，表示的是inode的最大数量，不是最大序号
 #define INODE_CACHE_SIZE 128 //系统可以缓存这么多inode
+#define DIRECTORY_ENTRY_CACHE_SIZE 128  //系统可以缓存这么多目录项
+#define OK 0
+#define ERROR_OFR -4
 
 typedef int FileFd; //文件句柄，实际上就是一个int
 enum INSTRUCT {

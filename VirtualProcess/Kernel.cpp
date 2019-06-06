@@ -6,12 +6,16 @@ Kernel::Kernel()
     std::cout << "Construct Kernel" << std::endl;
 #endif
     vfs.registerExt2(&ext2);
+    vfs.bindDirectoryInodeCache(&directoryCache);
+    vfs.bindInodeCache(&inodeCache);
+    vfs.bindSuperBlock(&superBlockCache);
     ext2.setBufferCache(&bufferCache);
     bufferCache.setDiskDriver(&diskDriver);
 }
-Kernel &Kernel::instance()
+Kernel *Kernel::instance()
 {
-    return Kernel::kernelInstance;
+    static Kernel kernelInstance;
+    return &kernelInstance;
 }
 VFS &Kernel::getVFS()
 {

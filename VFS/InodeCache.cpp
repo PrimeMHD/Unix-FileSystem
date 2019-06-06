@@ -1,5 +1,5 @@
 #include "../include/InodeCache.h"
-
+#include "../include/Kernel.h"
 void InodeCache::clearCache()
 {
   /**
@@ -24,22 +24,17 @@ Inode *InodeCache::getInodeByID(int inodeID)
     }
   }
 
-  //没有在inodeCache中找到，
-
-  return nullptr;
+  //没有在inodeCache中找到，需要从ext要，写入inodeCache
+  return &inodeCacheArea[addInodeCache(*(Kernel::instance()->getExt2().getDiskInodeByNum(inodeID)))];
 
 } //返回inodeCache块的缓存
 
 /**
  * 将磁盘Inode拷贝到InodeCache中，注意DiskInode和内存Inode数据结构的区别
  * 若InodeCache未满，则直接放入
- * 否则，通知VFS进行替换.
- * addInodeCache返回值的含义：
- * 返回-1：加入cache成功
- * 其他数值：需要被替换的inode号。
- * VFS应对返回其他数值的方式：getInodeByID检查dirty标志，
- *                        如果为false，通过ext2获得DiskInode直接replaceInodeCache
- *                        如果为true,将这个InodeCache刷回，然后再replaceInodeCache
+ * 否则,发生替换.
+ * addInodeCache返回值的含义：放入位置的下标
+ * 
  */
 int InodeCache::addInodeCache(DiskInode inode)
 {
@@ -50,15 +45,27 @@ int InodeCache::addInodeCache(DiskInode inode)
     //替换哪个呢？暂时采取随机替换的策略。TODO
     srand((unsigned)time(NULL));
     int ramdom_i = (rand() % (INODE_CACHE_SIZE - 10)) + 10;
-    //保留前几个inode不替换，因为比较常用
-    return ramdom_i;
+    //①确定替换的下标。保留前几个inode不替换，因为比较常用
+
+    if (inodeCacheArea[ramdom_i].dirty)
+    {
+      Kernel::instance()->getExt2().updateDiskInode(inodeCacheArea[ramdom_i].inode_id, inodeCacheArea[ramdom_i]);
+    }
+    //②可能发生脏inode写回
+
+    inodeCacheArea[pos] = Inode(inode);
+    inodeCacheBitmap.setBit(pos);
+    //③用新的inode覆盖掉
+
+    pos = ramdom_i;
   }
   else
   {
-    //TODO  需要定义DiskInode到Inode的转换构造函数
+
     inodeCacheArea[pos] = Inode(inode);
     inodeCacheBitmap.setBit(pos);
   }
+  return pos;
 }
 
 /**
@@ -66,13 +73,26 @@ int InodeCache::addInodeCache(DiskInode inode)
  */
 void InodeCache::replaceInodeCache(DiskInode inode, int replacedInodeID)
 {
+  //TODO 暂时好像没有需要
 }
 
 /**
- * 释放某指定inodeID的缓存
+ * 释放某指定inodeID的缓存.
+ * 返回值：若为-1表示没找到要释放的
+ * 否则，返回值表示被释放的inodeCache的数组下标
  */
-void InodeCache::freeInodeCache(int inodeID)
+int InodeCache::freeInodeCache(int inodeID)
 {
   //首先要找到这个inodeID的缓存放在哪个位置
   //然后修改bitmap
+  for (int i = 0; i < INODE_CACHE_SIZE; i++)
+  {
+    if (inodeCacheBitmap.getBitStat(i) && inodeCacheArea[i].inode_id == inodeID) //首先需要这个inodeCache是有效的
+    {
+      inodeCacheBitmap.unsetBit(i);
+      return i;
+    }
+  }
+
+  return -1; //表示没有找到要释放的。
 }

@@ -13,7 +13,7 @@ int main()
 
    //这些模块是依赖关系，不是组合关系。
 
-   shell.setVFS(&Kernel::instance().getVFS());
+   shell.setVFS(&Kernel::instance()->getVFS());
 
    shell.readUserInput();
 

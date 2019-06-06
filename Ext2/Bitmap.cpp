@@ -8,11 +8,17 @@ Bitmap::~Bitmap(){
 
 
 Bitmap::Bitmap(int elemNum){
-  bitmap=new uint8_t[elemNum]{0};
+  bitmap=new uint8_t[elemNum/BITMAP_PERBLOCK_SIZE+1]{0};
   bitmapSize=elemNum;
 //   memcpy(bitmap,0,DISK_SIZE/DISK_BLOCK_SIZE/8);
 }
-void Bitmap::setBit(int blockID){
+
+//NOTE 注意，盘块号是从0开始的。但是盘块数量是从1开始的
+int Bitmap::setBit(int blockID){
+
+  if(blockID>bitmapSize-1||blockID<0)
+    return ERROR_OFR;//范围非法
+
   int elemPos=blockID/BITMAP_PERBLOCK_SIZE;
   int innerPos=blockID%BITMAP_PERBLOCK_SIZE;
   //NOTE 显然这里也可以通过循环位移得到对应的掩码，但是不比下面的switch case快
@@ -47,10 +53,12 @@ switch (innerPos)
         break;
 }
 
-
+return OK;
 }
 
-void Bitmap::unsetBit(int blockID){
+int Bitmap::unsetBit(int blockID){
+    if(blockID>bitmapSize-1||blockID<0)
+        return ERROR_OFR;//范围非法
     int elemPos=blockID/BITMAP_PERBLOCK_SIZE;
     int innerPos=blockID%BITMAP_PERBLOCK_SIZE;
     switch (innerPos)
@@ -83,9 +91,12 @@ void Bitmap::unsetBit(int blockID){
         //cannot be reached!
         break;
     }
+    return OK;
 
 }
 bool Bitmap::getBitStat(int blockID){
+    if(blockID>bitmapSize-1||blockID<0)
+        return false;//范围非法
     int elemPos=blockID/BITMAP_PERBLOCK_SIZE;
     int innerPos=blockID%BITMAP_PERBLOCK_SIZE;
     bool ret=false;

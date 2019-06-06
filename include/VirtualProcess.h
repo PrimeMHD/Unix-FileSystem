@@ -12,35 +12,33 @@
 
 class VirtualProcess
 {
-  private:
-    User defaultUser;
-    static VirtualProcess instance;
-  public:
-    VirtualProcess();
-    ~VirtualProcess();
+private:
+  User defaultUser;
+  static VirtualProcess instance;
 
+public:
+  VirtualProcess();
+  ~VirtualProcess();
 
+  static VirtualProcess &Instance(); //单例模式，记得考虑线程安全
 
-    static VirtualProcess& Instance();  //单例模式，记得考虑线程安全
+  // /* 根据系统调用参数uid设置有效用户ID，真实用户ID，进程用户ID(p_uid) */
+  // void Setuid();
 
-    // /* 根据系统调用参数uid设置有效用户ID，真实用户ID，进程用户ID(p_uid) */
-    // void Setuid();
+  // /* 获取用户ID，低16比特为真实用户ID(u_ruid)，高16比特为有效用户ID(u_uid) */
+  // void Getuid();
 
-    // /* 获取用户ID，低16比特为真实用户ID(u_ruid)，高16比特为有效用户ID(u_uid) */
-    // void Getuid();
+  // /* 根据系统调用参数gid设置有效组ID，真实组ID */
+  // void Setgid();
 
-    // /* 根据系统调用参数gid设置有效组ID，真实组ID */
-    // void Setgid();
+  // /* 获取组ID, 低16比特为真实组ID(u_rgid)，高16比特为有效组ID(u_gid) */
+  // void Getgid();
 
-    // /* 获取组ID, 低16比特为真实组ID(u_rgid)，高16比特为有效组ID(u_gid) */
-    // void Getgid();
+  // /* 获取当前用户工作目录 */
+  // void Pwd();
 
-    // /* 获取当前用户工作目录 */
-    // void Pwd();
-
-  
-    /* 获取User结构 */
-    User getUser();
+  /* 获取User结构 */
+  User &getUser();
 };
 
 #endif

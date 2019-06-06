@@ -14,8 +14,8 @@ class Bitmap{
   public:
     Bitmap(int elemNum);
     ~Bitmap();
-    void setBit(int elemID);
-    void unsetBit(int elemID); 
+    int setBit(int elemID);
+    int unsetBit(int elemID); 
     bool getBitStat(int elemID);
     int getAFreeBitNum();
     void clear();

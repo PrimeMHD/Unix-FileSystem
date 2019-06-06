@@ -4,6 +4,7 @@
 #include "Inode.h"
 #include "Bitmap.h"
 #include "DiskInode.h"
+
 /**
  * 内存inode缓存区域.
  * 可选的inode缓存区域的结构：
@@ -15,20 +16,21 @@
  * 刷回磁盘需要做的一些工作，可以在这里完成。
  * //TEMP 目前反正inodeCache也不多，卸载刷回的时候，不管脏不脏都刷回
  */
-class InodeCache{
+class InodeCache
+{
 
-//TODO
+  //TODO
 private:
   Inode inodeCacheArea[INODE_CACHE_SIZE];
   Bitmap inodeCacheBitmap;
-public:
-  InodeCache():inodeCacheBitmap(INODE_CACHE_SIZE){}
-  void clearCache();
-  Inode* getInodeByID(int inodeID);//返回inodeCache块的缓存
-  int addInodeCache(DiskInode inode);
-  void freeInodeCache(int inodeID);
-  void replaceInodeCache(DiskInode inode, int replacedInodeID);
 
+public:
+  InodeCache() : inodeCacheBitmap(INODE_CACHE_SIZE) {}
+  void clearCache();
+  Inode *getInodeByID(int inodeID); //返回inodeCache块的缓存
+  int addInodeCache(DiskInode inode);
+  int freeInodeCache(int inodeID);
+  void replaceInodeCache(DiskInode inode, int replacedInodeID);
 };
 
 #endif

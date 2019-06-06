@@ -2,13 +2,20 @@
 #define DIRECTORY_CACHE_H
 #include "define.h"
 #include "DirectoryEntry.h"
-//这个高级了，有时间再实现。
+
 /**
  * 缓存最近使用过的目录项，减少访问磁盘的次数
  */
 
 class DirectoryCache{
-//TODO
+
+private:
+  DirectoryEntry directoryEntryCacheArea[DIRECTORY_ENTRY_CACHE_SIZE];
+  Bitmap directoryEntryCacheBitmap;
+
+public:
+  DirectoryCache():directoryEntryCacheBitmap(DIRECTORY_ENTRY_CACHE_SIZE) {}
+
 };
 
 
