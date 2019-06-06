@@ -25,6 +25,11 @@
 #define ERROR_OFR -4
 
 typedef int FileFd; //文件句柄，实际上就是一个int
+typedef int InodeId;  //inode号，实际上是一个int
+typedef const char *FileName;  //文件名
+
+
+
 enum INSTRUCT {
     ERROR_INST = -1,
     MOUNT,

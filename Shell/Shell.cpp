@@ -166,9 +166,22 @@ void Shell::unmount()
 {
     Logcat::log(TAG, "unmount EXEC");
 }
+
+/**
+ * 对装载的磁盘镜像做格式化
+ */
 void Shell::format()
 {
-    Logcat::log(TAG, "format EXEC");
+
+    if (bounded_VFS->isMounted())
+    {
+        bounded_VFS->format();
+        Logcat::log(TAG, "format EXEC");
+    }
+    else
+    {
+        Logcat::log(TAG, "ERROR,DISK NOT MOUNTED!");
+    }
 }
 void Shell::mkdir()
 {

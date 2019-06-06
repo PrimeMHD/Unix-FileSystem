@@ -4,22 +4,23 @@ void Ext2::updateDiskInode(int inodeID, DiskInode diskInode)
 {
 }
 
+void Ext2::format()
+{
+}
 
-/**
+int Ext2::registerFs()
+{
+    /**
  * mount的前一步在vfs.cpp中完成
- * ②DiskDriver打开虚拟磁盘img，mmap，进入就绪状态
- * ③装载SuperBlock到VFS的SuperBlock缓存
+ * 
+ * 
  * 
  */
-void Ext2::mount()
-{
-
-
-
+    bufferCache->mount(); //②DiskDriver打开虚拟磁盘img，mmap，进入就绪状态
+    //③ext模块中的指针赋值，指向img文件内存映射的地址。
+    //④装载SuperBlock到VFS的SuperBlock缓存(这一步需要经过缓存层)
 }
-void Ext2::unmount()
-{
-}
+
 int Ext2::setBufferCache(BufferCache *bufferCache)
 {
     return OK;
@@ -33,10 +34,28 @@ DiskInode *Ext2::getDiskInodeByNum(int inodeID)
     return nullptr;
 }
 
-int Ext2::getInodeNumByPath(Path path)
+/**
+ * VFS在inodeDirectoryCache失效的时候，会调用本函数，在磁盘上根据路径确定inode号
+ */
+InodeId Ext2::locateInode(Path path)
 {
     return OK;
 }
+
+/**
+ * VFS在inodeDirectoryCache失效的时候，会调用本函数，在磁盘上根据路径确定inode号
+ */
+InodeId Ext2::locateDir(Path path)
+{
+    return OK;
+}
+
+//根据目录的inode和文件名，在目录表中查找
+InodeId Ext2::getInodeIdInDir(InodeId dirInodeId, FileName fileName)
+{
+    return OK;
+}
+
 int Ext2::bmap(int inodeNum, int logicBlockNum)
 {
 

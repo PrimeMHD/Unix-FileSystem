@@ -4,15 +4,18 @@ void BufferCache::setDiskDriver(DiskDriver *diskDriver)
 }
 void BufferCache::mount()
 {
+    diskDriver->mount();
 }
 void BufferCache::unmount()
 {
 
 } //unmount的时候需要把脏缓存刷回
+
 void BufferCache::readBlk(int blkNum)
 {
 
 } //将物理盘块一整块读入diskBlockPool
+
 void BufferCache::writeBlk(int blkNum, const DiskBlock &contentToWrite)
 {
 

@@ -17,9 +17,12 @@ void VFS::mount()
      * ③装载SuperBlock到VFS的SuperBlock缓存
      * 
      *  */
-    inodeCache->clearCache();  //完成①
-    ext2->mount();     //完成②③
-
+    inodeCache->clearCache(); //完成①
+    if (OK == ext2->registerFs())
+    {
+        Mounted = true;
+    } //完成②③
+    // 成功的话将Mounted设置为true
 }
 void VFS::unmount()
 {
@@ -67,12 +70,20 @@ void VFS::unregisterExt2()
 {
 }
 
-  void VFS::bindSuperBlock(SuperBlock* superblock){
-      this->superBlock=superblock;
-  }
-  void VFS::bindInodeCache(InodeCache *inodeCache){
-      this->inodeCache=inodeCache;
-  }
-  void VFS::bindDirectoryInodeCache(DirectoryCache *directoryCache){
-      this->directoryCache=directoryCache;
-  }
+void VFS::bindSuperBlock(SuperBlock *superblock)
+{
+    this->superBlock = superblock;
+}
+void VFS::bindInodeCache(InodeCache *inodeCache)
+{
+    this->inodeCache = inodeCache;
+}
+void VFS::bindDirectoryInodeCache(DirectoryCache *directoryCache)
+{
+    this->directoryCache = directoryCache;
+}
+
+bool VFS::isMounted()
+{
+    return Mounted;
+}

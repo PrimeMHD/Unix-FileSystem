@@ -17,14 +17,18 @@ private:
   BufferCache *bufferCache; //绑定的BufferCache,ext2不直接和DiskDriver打交道，透过这个缓存层
 
 public:
-  void mount();
-  void unmount();
+  void format(); //格式化
+  int registerFs();
+
   int setBufferCache(BufferCache *bufferCache);
   int allocNewInode(); //分配一个新的inode
   DiskInode *getDiskInodeByNum(int inodeID);
   void updateDiskInode(int inodeID, DiskInode diskInode);
 
-  int getInodeNumByPath(Path path);
+  InodeId locateInode(Path path);
+  InodeId locateDir(Path path);
+  InodeId getInodeIdInDir(InodeId dirInodeId, FileName fileName);
+
   int bmap(int inodeNum, int logicBlockNum); //文件中的地址映射。查混合索引表，确定物理块号。
                                              //逻辑块号bn=u_offset/512
 };
