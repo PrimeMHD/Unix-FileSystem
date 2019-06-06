@@ -1,5 +1,7 @@
 #include "../include/Kernel.h"
 
+Kernel Kernel::kernelInstance;
+
 Kernel::Kernel()
 {
 #ifdef IS_DEBUG
@@ -8,14 +10,14 @@ Kernel::Kernel()
     vfs.registerExt2(&ext2);
     vfs.bindDirectoryInodeCache(&directoryCache);
     vfs.bindInodeCache(&inodeCache);
-    vfs.bindSuperBlock(&superBlockCache);
+    vfs.bindSuperBlockCache(&superBlockCache);
     ext2.setBufferCache(&bufferCache);
     bufferCache.setDiskDriver(&diskDriver);
 }
 Kernel *Kernel::instance()
 {
-    static Kernel kernelInstance;
-    return &kernelInstance;
+
+    return &Kernel::kernelInstance;
 }
 VFS &Kernel::getVFS()
 {

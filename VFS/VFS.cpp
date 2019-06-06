@@ -1,4 +1,5 @@
 #include "../include/VFS.h"
+#include "../include/Logcat.h"
 VFS::VFS()
 {
 }
@@ -18,7 +19,7 @@ void VFS::mount()
      * 
      *  */
     inodeCache->clearCache(); //完成①
-    if (OK == ext2->registerFs())
+    if (OK == p_ext2->registerFs())
     {
         Mounted = true;
     } //完成②③
@@ -30,6 +31,47 @@ void VFS::unmount()
 
 int VFS::format()
 {
+    if (!Mounted)
+    {
+        printf("ERROR!磁盘未装载！\n");
+        return ERROR_NOTSPEC;
+    }
+    else
+    {
+        switch (p_ext2->getExt2Status())
+        {
+        case Ext2_UNINITIALIZED:
+            printf("ERROR!磁盘装载错误！\n");
+            break;
+        case Ext2_NOFORM:
+            p_ext2->format();
+            break;
+        case Ext2_READY:
+            printf("WARNING!磁盘可能已有数据！确定要格式化吗？\n");
+            printf("Press \"y\" for yes, \"n\" for no:");
+            char temp_cmd;
+            while (temp_cmd = getchar())
+            {
+                if (temp_cmd == 'y')
+                {
+                    p_ext2->format();
+                    break;
+                }
+                else if (temp_cmd == 'n')
+                {
+                    return ERROR_CANCEL;
+                    break;
+                }
+                else
+                {
+                    printf("\nPress \"y\" for yes, \"n\" for no:");
+                }
+            }
+            break;
+        default:
+            break;
+        }
+    }
     return OK;
 }
 int VFS::createFile(const char *fileName)
@@ -63,16 +105,17 @@ int VFS::write(int fd, u_int8_t *content, int length)
 {
     return OK;
 }
-void VFS::registerExt2(Ext2 *ext2)
+void VFS::registerExt2(Ext2 *p_ext2)
 {
+    this->p_ext2 = p_ext2;
 }
 void VFS::unregisterExt2()
 {
 }
 
-void VFS::bindSuperBlock(SuperBlock *superblock)
+void VFS::bindSuperBlockCache(SuperBlockCache *superBlockCache)
 {
-    this->superBlock = superblock;
+    this->superBlockCache = superBlockCache;
 }
 void VFS::bindInodeCache(InodeCache *inodeCache)
 {

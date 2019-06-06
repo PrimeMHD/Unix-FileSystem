@@ -1,10 +1,11 @@
 #include "../include/BufferCache.h"
 void BufferCache::setDiskDriver(DiskDriver *diskDriver)
 {
+    this->diskDriver = diskDriver;
 }
-void BufferCache::mount()
+int BufferCache::mount()
 {
-    diskDriver->mount();
+    return diskDriver->mount();
 }
 void BufferCache::unmount()
 {

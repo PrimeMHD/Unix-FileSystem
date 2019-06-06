@@ -6,20 +6,20 @@
 #include "DiskDriver.h"
 #include "BufferCache.h"
 #include "DirectoryCache.h"
+#include "SuperBlockCache.h"
 
 class Kernel
 {
 private:
   Kernel();
   static Kernel kernelInstance;
-  VFS vfs;
-  Ext2 ext2;
-  DiskDriver diskDriver;
-  BufferCache bufferCache;
-
   InodeCache inodeCache;
   DirectoryCache directoryCache;
-  SuperBlock superBlockCache;
+  SuperBlockCache superBlockCache;
+  BufferCache bufferCache;
+  DiskDriver diskDriver;
+  Ext2 ext2;
+  VFS vfs;
 
 public:
   static Kernel *instance();
@@ -30,3 +30,4 @@ public:
 };
 
 #endif
+

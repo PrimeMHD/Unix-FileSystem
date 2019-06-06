@@ -16,15 +16,20 @@ DiskDriver::~DiskDriver()
  * 磁盘安装的过程，superblock的刷入，在ext中执行。
  * 这里做的是磁盘镜像文件的打开和内存映射。感谢神奇的mmap
  * 打开img文件,如果没有就尝试创建
+ * @return: 如果返回-1表示mount失败，返回0表示有现成的img文件，
+ * 返回1表示img文件新生成
  *  */
-void DiskDriver::mount()
+int DiskDriver::mount()
 {
+
+   int retVal = -1;
    //打开img文件,如果没有就尝试创建
    DiskFd = open(DISK_IMG_FILEPATH, O_RDWR | O_CREAT, 0);
    if (DiskFd == -1)
    {
       Logcat::log(TAG, "Mount Disk Failed!");
       exit(-1);
+      retVal = -1;
    }
    else
    {
@@ -40,6 +45,11 @@ void DiskDriver::mount()
       //说明是新创建的文件，需要改变文件的大小
       lseek(DiskFd, 0, SEEK_SET);
       ftruncate(DiskFd, DISK_SIZE);
+      retVal = 1;
+   }
+   else
+   {
+      retVal = 0;
    }
 
    /**
@@ -52,12 +62,15 @@ void DiskDriver::mount()
    {
       Logcat::log(TAG, "Mmap失败！");
       exit(-1);
+      retVal = -1;
    }
    else
    {
       Logcat::log(TAG, "Mmap成功！");
+      isMounted = true;
    }
-   isMounted = true;
+
+   return retVal;
 }
 
 /**
@@ -97,4 +110,9 @@ void DiskDriver::writeBlk(int blockNum, const DiskBlock &blk)
 bool DiskDriver::isDiskMounted()
 {
    return isMounted;
+}
+
+DiskBlock *DiskDriver::getDiskMemAddr()
+{
+   return DiskMemAddr;
 }
