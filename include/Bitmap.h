@@ -8,7 +8,7 @@
  */
 class Bitmap{
   private:
-    uint8_t *bitmap;
+    uint8_t bitmap[MAX_BITMAP_ELEM_NUM/BITMAP_PERBLOCK_SIZE+1]{0};
     int bitmapSize;
     //按位操作，又快又省空间
   public:

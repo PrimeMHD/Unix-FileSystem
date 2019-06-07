@@ -12,8 +12,10 @@
 class InodePool{
   //TODO
   private:
-    Inode inodeBlock[MAX_INODE_NUM];  //INODE数组存放区域
     Bitmap inodePoolBitmap;
+    char padding[2040];  //NOTE 这个是手工计算的，为的是让InodePool占满3个盘块
+    Inode inodeBlock[MAX_INODE_NUM];  //INODE数组存放区域  Inode的大小为64字节
+    
 
   public:
     InodePool();

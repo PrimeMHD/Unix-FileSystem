@@ -2,23 +2,29 @@
 #include "../include/Kernel.h"
 Inode::Inode()
 {
-    dirty = false;
-    inode_id = 0;
-    memset(i_addr, 0, 10 * sizeof(int));
+    // dirty = false;
+    // inode_id = 0;
+    // memset(i_addr, 0, 10 * sizeof(int));
 }
 
 /**
- * 转换构造函数
+ * 转换构造函数,
  * 将磁盘inode结构转换为内存inode结构
+ * NOTE:需要对i_number进行单独的赋值
  */
 Inode::Inode(DiskInode d_inode)
 {
-    dirty = false;                                    //脏位初始为false
-    inode_id = d_inode.inode_id;                      //inode号
-    uid = d_inode.uid;                                //uid
-    file_size = d_inode.file_size;                    //文件大小
-    fileType = d_inode.fileType;                      //文件类型
-    memcpy(i_addr, d_inode.i_addr, 10 * sizeof(int)); //混合索引表
+    this->i_mode = d_inode.d_mode;
+    this->i_nlink = d_inode.d_nlink;
+    this->i_uid = d_inode.d_uid;
+    this->i_gid = d_inode.d_gid;
+    this->i_size = d_inode.d_size;
+    memcpy(this->i_addr, d_inode.d_addr, sizeof(d_inode.d_addr));
+    this->i_flag = 0;
+    this->i_count = 0;
+    this->i_dev = 0;
+    //this->i_number = ? ;s  注意！DISKINODE是没有INODE号这个属性的，一个DISKINODE的号是固定的，可以根据其位置算出来
+    this->i_lastr = -1;
 }
 
 /**

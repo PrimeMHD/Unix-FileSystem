@@ -21,7 +21,12 @@ public:
   int total_block_num;           //总盘块数
   int total_inode_num;           //总inode数
   Bitmap disk_block_bitmap;      //用bitmap管理空闲盘块
-  char padding[];
+  char padding[2016];            //NOTE:这个2016是手工计算的结果。只针对ubuntu系统，也许别的机器就不对了。
+                                 //确保一个SuperBlock填满一个block
+
+  BlkNum balloc();
+  void bfree(BlkNum blkNum);
+  void bsetOccupy(BlkNum blkNum);
 };
 
 #endif
