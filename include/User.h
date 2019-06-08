@@ -19,6 +19,7 @@ public:
 	DirectoryEntry u_dent;				 /* 当前目录的目录项 */
 	char u_dbuf[DirectoryEntry::DIRSIZ]; /* 当前路径分量 */
 	char u_curdir[128];					 /* 当前工作目录完整路径 */
+	InodeId curDirInodeId;
 
 	/* 进程的用户标识 */
 	/* 因为本应用没有多用户的概念，这里写死也无妨 */

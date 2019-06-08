@@ -38,55 +38,51 @@ int Inode::Bmap(int lbn)
     int phyBlkno; /* 转换后的物理盘块号 */
     int *iTable;  /* 用于访问索引盘块中一次间接、两次间接索引表 */
     int index;
-    return OK;
-
     //User &u = Kernel::Instance().GetUser();
 
-    // /**
-    //  * 超出支持的最大文件块数
-    //  */
-    // if (lbn >= Inode::HUGE_FILE_BLOCK)
-    // {
-    //     //u.u_error = User::EFBIG;
-    //     return 0;
-    // }
+    /**
+     * 超出支持的最大文件块数
+     */
+    if (lbn >= Inode::HUGE_FILE_BLOCK)
+    {
+        //u.u_error = User::EFBIG;
+        return ERROR_LBN_OVERFLOW;
+    }
 
-    // if (lbn < 6) /* 如果是小型文件，从基本索引表i_addr[0-5]中获得物理盘块号即可 */
-    // {
-    //     phyBlkno = this->i_addr[lbn];
+    if (lbn < 6) /* 如果是小型文件，从基本索引表i_addr[0-5]中获得物理盘块号即可 */
+    {
+        phyBlkno = this->i_addr[lbn];
 
-    //     /*
-    // 	 * 如果该逻辑块号还没有相应的物理盘块号与之对应，则分配一个物理块。
-    // 	 * 这通常发生在对文件的写入，当写入位置超出文件大小，即对当前
-    // 	 * 文件进行扩充写入，就需要分配额外的磁盘块，并为之建立逻辑块号
-    // 	 * 与物理盘块号之间的映射。
-    // 	 */
-    //     if (phyBlkno == 0 && (pFirstBuf = fileSys.Alloc(this->i_dev)) != NULL)
-    //     {
-    //         /*
-    // 		 * 因为后面很可能马上还要用到此处新分配的数据块，所以不急于立刻输出到
-    // 		 * 磁盘上；而是将缓存标记为延迟写方式，这样可以减少系统的I/O操作。
-    // 		 */
-    //         bufMgr.Bdwrite(pFirstBuf);
-    //         phyBlkno = pFirstBuf->b_blkno;
-    //         /* 将逻辑块号lbn映射到物理盘块号phyBlkno */
-    //         this->i_addr[lbn] = phyBlkno;
-    //         this->i_flag |= Inode::IUPD;
-    //     }
-    //     /* 找到预读块对应的物理盘块号 */
-    //     Inode::rablock = 0;
-    //     if (lbn <= 4)
-    //     {
-    //         /*
-    // 		 * i_addr[0] - i_addr[5]为直接索引表。如果预读块对应物理块号可以从
-    // 		 * 直接索引表中获得，则记录在Inode::rablock中。如果需要额外的I/O开销
-    // 		 * 读入间接索引块，就显得不太值得了。漂亮！
-    // 		 */
-    //         Inode::rablock = this->i_addr[lbn + 1];
-    //     }
+        /*
+    	 * 如果该逻辑块号还没有相应的物理盘块号与之对应，则分配一个物理块。
+    	 * 这通常发生在对文件的写入，当写入位置超出文件大小，即对当前
+    	 * 文件进行扩充写入，就需要分配额外的磁盘块，并为之建立逻辑块号
+    	 * 与物理盘块号之间的映射。
+    	 */
+        if (phyBlkno == 0)
+        {
+            phyBlkno = Kernel::instance()->getSuperBlockCache().balloc();
+            if (phyBlkno == -1)
+            {
+                //分配失败。可能没有空闲空间了
+            }
+            else
+            {
+                //分配盘块成功，这里的superblock已经改过了哟
+                //bufMgr.Bdwrite(pFirstBuf);
+                //phyBlkno = pFirstBuf->b_blkno;
+                /* 将逻辑块号lbn映射到物理盘块号phyBlkno */
+                this->i_addr[lbn] = phyBlkno;
+                this->i_flag |= Inode::IUPD;
+            }
+            /*
+    		 * 因为后面很可能马上还要用到此处新分配的数据块，所以不急于立刻输出到
+    		 * 磁盘上；而是将缓存标记为延迟写方式，这样可以减少系统的I/O操作。
+    		 */
+        }
 
-    //     return phyBlkno;
-    // }
+        return phyBlkno;
+    }
     // else /* lbn >= 6 大型、巨型文件 */
     // {
     //     /* 计算逻辑块号lbn对应i_addr[]中的索引 */

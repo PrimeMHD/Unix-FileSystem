@@ -3,10 +3,6 @@
 #include "../include/VirtualProcess.h"
 #include "../include/TimeHelper.h"
 
-void Ext2::updateDiskInode(int inodeID, DiskInode diskInode)
-{
-}
-
 /**
  * 这个函数貌似是最格格不入的。
  * 为了简便，做硬写入。不经过缓存层，直接借助mmap对img进行写入完成初始化。
@@ -209,9 +205,32 @@ int Ext2::allocNewInode()
 {
     return OK;
 }
-DiskInode *Ext2::getDiskInodeByNum(int inodeID)
+//写回脏inode回磁盘（可能还是在缓存中，但是这里不管，缓存层是透明的）
+void Ext2::updateDiskInode(int inodeID, DiskInode diskInode)
 {
-    return nullptr;
+    //要先读后写!
+    int blkno = 2 + inodeID / (DISK_BLOCK_SIZE / DISKINODE_SIZE);
+    Buf *pBuf;
+    pBuf = p_bufferCache->Bread(blkno);
+    DiskInode *p_diskInode = (DiskInode *)pBuf->b_addr;
+    p_diskInode = p_diskInode + inodeID % (DISK_BLOCK_SIZE / DISKINODE_SIZE);
+    //定位到需要写diskInode的位置
+    *p_diskInode = diskInode;     //更新DiskInode
+    p_bufferCache->Bdwrite(pBuf); //bdwrite中会做brelse的。
+    //p_bufferCache->Brelse(pBuf);
+}
+//从disk中读取出一个制定inodeID的DiskInode.可能涉及io了（不确定在不在缓存中）
+DiskInode Ext2::getDiskInodeByNum(int inodeID)
+{
+    //inode分布在两个盘块上，首先根据inodeID计算在哪个盘块上
+    int blkno = 2 + inodeID / (DISK_BLOCK_SIZE / DISKINODE_SIZE);
+    Buf *pBuf;
+    pBuf = p_bufferCache->Bread(blkno);
+    DiskInode *p_diskInode = (DiskInode *)pBuf->b_addr;
+    DiskInode tempDiskInode;
+    tempDiskInode = *(p_diskInode + inodeID % (DISK_BLOCK_SIZE / DISKINODE_SIZE));
+    p_bufferCache->Brelse(pBuf);
+    return tempDiskInode; //外部可能会调用DiskInode的拷贝构造函数
 }
 
 /**

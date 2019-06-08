@@ -1,5 +1,6 @@
 #include "../include/VFS.h"
 #include "../include/Logcat.h"
+#include "../include/Kernel.h"
 VFS::VFS()
 {
 }
@@ -86,21 +87,42 @@ int VFS::cd(const char *dirName)
 {
     return OK;
 }
-void VFS::ls(int dirInodeID)
-{
-}
 
+void VFS::ls(InodeId dirInodeID)
+{
+    //首先要获得这个inode->访问这个目录文件
+    //step1: 检查inodeCache中有没有，有则直接用，没有则向Ext2模块要
+    Inode &inode = *inodeCache->getInodeByID(dirInodeID);
+    inode.i_flag |= Inode::IACC;
+    //Step2：读这个目录文件到缓存块中（可能已经存在于缓存块中,规定目录文件不能超过4096B）
+    int blkno = inode.Bmap(0); //Bmap查物理块号
+    Buf *pBuf;
+    pBuf = Kernel::instance()->getBufferCache().Bread(blkno);
+    DirectoryEntry *p_directoryEntry = (DirectoryEntry *)pBuf->b_addr;
+    //Step3：访问这个目录文件中的entry，打印出来（同时缓存到dentryCache中）
+    //TODO 缓存到dentryCache中
+    while (strlen(p_directoryEntry->m_name) != 0)
+    {
+        printf("%s ", p_directoryEntry->m_name);
+    }
+
+    Kernel::instance()->getBufferCache().Brelse(pBuf);
+}
 
 void VFS::ls(const char *dirName)
 {
     //首先要根据目录名，确定inode号
     //step1 在DirectoryEntry中查找有没有现成的
+    InodeId dirInodeId;
 
+    Path path(dirName); //解析dirName转化为Path对象
+    //先查一下directoryCache中有没有存dirName的目录项
+    //TODO 先暂时不做VFS层的dentry缓存
+
+    //没有，则向Ext模块要
+    dirInodeId = p_ext2->locateInode(path);
+    ls(dirInodeId);
 }
-
-
-
-
 
 int VFS::open(Path path)
 {

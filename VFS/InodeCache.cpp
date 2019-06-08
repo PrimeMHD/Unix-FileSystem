@@ -25,7 +25,7 @@ Inode *InodeCache::getInodeByID(int inodeID)
   }
 
   //没有在inodeCache中找到，需要从ext要，写入inodeCache
-  return &inodeCacheArea[addInodeCache(*(Kernel::instance()->getExt2().getDiskInodeByNum(inodeID)))];
+  return &inodeCacheArea[addInodeCache((Kernel::instance()->getExt2().getDiskInodeByNum(inodeID)))];
 
 } //返回inodeCache块的缓存
 

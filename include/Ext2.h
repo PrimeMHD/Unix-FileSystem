@@ -29,7 +29,7 @@ public:
   Ext2_Status getExt2Status();
   int setBufferCache(BufferCache *p_bufferCache);
   int allocNewInode(); //分配一个新的inode
-  DiskInode *getDiskInodeByNum(int inodeID);
+  DiskInode getDiskInodeByNum(int inodeID);
   void updateDiskInode(int inodeID, DiskInode diskInode);
 
   InodeId locateInode(Path path);

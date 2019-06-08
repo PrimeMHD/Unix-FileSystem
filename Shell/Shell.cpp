@@ -240,14 +240,14 @@ void Shell::lseek()
  */
 void Shell::ls()
 {
-    if (getParam(1) == "\0")
+    if (!strcmp(getParam(1), ""))
     {
         //不带参数的ls，以curDir为默认参数
-        bounded_VFS->ls("/");
+        bounded_VFS->ls(VirtualProcess::Instance()->getUser().curDirInodeId);
     }
     else
     {
-        bounded_VFS->ls(VirtualProcess::Instance()->getUser().u_curdir);
+        bounded_VFS->ls(getParam(1)); //getParam(1)获得的是ls后面跟的目录名（可能是相对的也可能是绝对的）
     }
 }
 

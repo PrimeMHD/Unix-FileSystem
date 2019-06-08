@@ -6,6 +6,7 @@ VirtualProcess::VirtualProcess()
 {
     //TODO 需要初始化VirtualProcess
     strcpy(defaultUser.u_curdir, "/");
+    defaultUser.curDirInodeId=1;
 }
 
 VirtualProcess::~VirtualProcess()
