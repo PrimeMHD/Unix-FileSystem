@@ -1,7 +1,7 @@
 #ifndef INODE_POOL_H
 #define INODE_POOL_H
 #include "define.h"
-#include "Inode.h"
+#include "DiskInode.h"
 #include "Bitmap.h"
 
 /**
@@ -14,14 +14,15 @@ class InodePool{
   private:
     Bitmap inodePoolBitmap;
     char padding[2040];  //NOTE 这个是手工计算的，为的是让InodePool占满3个盘块
-    Inode inodeBlock[MAX_INODE_NUM];  //INODE数组存放区域  Inode的大小为64字节
+    DiskInode inodeBlock[MAX_INODE_NUM];  //INODE数组存放区域  Inode的大小为64字节
     
 
   public:
     InodePool();
     int ialloc();
-    void ifree(int InodeID);
-    Inode* getInode(int InodeID);
+    void ifree(InodeId inodeID);
+    void iupdate(InodeId inodeId,DiskInode diskInode);  
+    DiskInode* getInode(InodeId inodeID);
 
 };
 

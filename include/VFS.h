@@ -24,7 +24,7 @@ public:
   int createFile(const char *fileName); //返回分配的Inode编号
   int mkDir(const char *dirName);       //返回分配的Inode编号
   int cd(const char *dirName);          //返回进入的dir的Inode
-
+  void ls(const char *dirName);
   void ls(int dirInodeID);
   int open(Path path);
   int close(int fd);

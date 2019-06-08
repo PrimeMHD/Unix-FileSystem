@@ -18,7 +18,7 @@ Inode *InodeCache::getInodeByID(int inodeID)
    */
   for (int i = 0; i < INODE_CACHE_SIZE; i++)
   {
-    if (inodeCacheBitmap.getBitStat(i) && inodeCacheArea[i].inode_id == inodeID) //首先需要这个inodeCache是有效的
+    if (inodeCacheBitmap.getBitStat(i) && inodeCacheArea[i].i_number == inodeID) //首先需要这个inodeCache是有效的
     {
       return &inodeCacheArea[i];
     }
@@ -47,9 +47,9 @@ int InodeCache::addInodeCache(DiskInode inode)
     int ramdom_i = (rand() % (INODE_CACHE_SIZE - 10)) + 10;
     //①确定替换的下标。保留前几个inode不替换，因为比较常用
 
-    if (inodeCacheArea[ramdom_i].dirty)
+    if ((inodeCacheArea[ramdom_i].i_flag & (Inode::IUPD | Inode::IACC)) != 0)
     {
-      Kernel::instance()->getExt2().updateDiskInode(inodeCacheArea[ramdom_i].inode_id, inodeCacheArea[ramdom_i]);
+      Kernel::instance()->getExt2().updateDiskInode(inodeCacheArea[ramdom_i].i_number, inodeCacheArea[ramdom_i]);
     }
     //②可能发生脏inode写回
 
@@ -87,7 +87,7 @@ int InodeCache::freeInodeCache(int inodeID)
   //然后修改bitmap
   for (int i = 0; i < INODE_CACHE_SIZE; i++)
   {
-    if (inodeCacheBitmap.getBitStat(i) && inodeCacheArea[i].inode_id == inodeID) //首先需要这个inodeCache是有效的
+    if (inodeCacheBitmap.getBitStat(i) && inodeCacheArea[i].i_number == inodeID) //首先需要这个inodeCache是有效的
     {
       inodeCacheBitmap.unsetBit(i);
       return i;

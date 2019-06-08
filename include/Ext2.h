@@ -38,5 +38,6 @@ public:
 
   int bmap(int inodeNum, int logicBlockNum); //文件中的地址映射。查混合索引表，确定物理块号。
   //逻辑块号bn=u_offset/512
+  void loadSuperBlock(SuperBlock &superBlock);
 };
 #endif

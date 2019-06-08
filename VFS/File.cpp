@@ -6,7 +6,6 @@
  * 进行了一些删改
  * */
 
-
 /*==============================class File===================================*/
 File::File()
 {
@@ -33,49 +32,45 @@ OpenFiles::~OpenFiles()
 int OpenFiles::AllocFreeSlot()
 {
 	int i;
-	 const User& u = VirtualProcess::Instance().getUser();
-	
-	for(i = 0; i < OpenFiles::NOFILES; i++)
+	const User &u = VirtualProcess::Instance()->getUser();
+
+	for (i = 0; i < OpenFiles::NOFILES; i++)
 	{
 		/* 进程打开文件描述符表中找到空闲项，则返回之 */
-		if(this->ProcessOpenFileTable[i] == NULL)
+		if (this->ProcessOpenFileTable[i] == NULL)
 		{
 			/* 设置核心栈现场保护区中的EAX寄存器的值，即系统调用返回值 */
 			return i;
 		}
 	}
 
-	
 	return -1;
 }
 
-
-
-File* OpenFiles::GetF(int fd)
+File *OpenFiles::GetF(int fd)
 {
-	File* pFile;
-	const User& u = VirtualProcess::Instance().getUser();
-	
-	
+	File *pFile;
+	const User &u = VirtualProcess::Instance()->getUser();
+
 	/* 如果打开文件描述符的值超出了范围 */
-	if(fd < 0 || fd >= OpenFiles::NOFILES)
+	if (fd < 0 || fd >= OpenFiles::NOFILES)
 	{
 		// u.u_error = User::EBADF;
 		return NULL;
 	}
 
 	pFile = this->ProcessOpenFileTable[fd];
-	if(pFile == NULL)
+	if (pFile == NULL)
 	{
 		// u.u_error = User::EBADF;
 	}
 
-	return pFile;	/* 即使pFile==NULL也返回它，由调用GetF的函数来判断返回值 */
+	return pFile; /* 即使pFile==NULL也返回它，由调用GetF的函数来判断返回值 */
 }
 
-void OpenFiles::SetF(int fd, File* pFile)
+void OpenFiles::SetF(int fd, File *pFile)
 {
-	if(fd < 0 || fd >= OpenFiles::NOFILES)
+	if (fd < 0 || fd >= OpenFiles::NOFILES)
 	{
 		return;
 	}

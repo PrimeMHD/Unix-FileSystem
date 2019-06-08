@@ -27,7 +27,7 @@ public:
   Ext2 &getExt2();
   DiskDriver &getDiskDriver();
   BufferCache &getBufferCache();
+  SuperBlockCache &getSuperBlockCache();
 };
 
 #endif
-

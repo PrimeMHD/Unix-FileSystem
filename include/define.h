@@ -25,6 +25,7 @@
 #define MAX_INODE_NUM (2 * DISK_BLOCK_SIZE / DISKINODE_SIZE) //用两块磁盘块存放inode，表示的是inode的最大数量，不是最大序号
 #define INODE_CACHE_SIZE 128                                 //系统可以缓存这么多inode
 #define DIRECTORY_ENTRY_CACHE_SIZE 128                       //系统可以缓存这么多目录项
+#define MIXED_ADDR_TABLE_SIZE (10 * sizeof(int))             //混合索引表数组所占空间的大小
 #define OK 0
 #define ERROR_OFR -4
 #define ERROR_NOTSPEC -1 //并不想指明哪一种错误，但是是错误

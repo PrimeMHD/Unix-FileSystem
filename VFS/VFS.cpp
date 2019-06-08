@@ -89,6 +89,19 @@ int VFS::cd(const char *dirName)
 void VFS::ls(int dirInodeID)
 {
 }
+
+
+void VFS::ls(const char *dirName)
+{
+    //首先要根据目录名，确定inode号
+    //step1 在DirectoryEntry中查找有没有现成的
+
+}
+
+
+
+
+
 int VFS::open(Path path)
 {
     return OK;

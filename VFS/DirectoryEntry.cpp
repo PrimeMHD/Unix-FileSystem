@@ -1,10 +1,11 @@
 #include "../include/DirectoryEntry.h"
 
-	/* Constructors */
-DirectoryEntry::DirectoryEntry(){
-
+/* Constructors */
+DirectoryEntry::DirectoryEntry()
+{
+	m_ino = 0;
 }
-	/* Destructors */
-DirectoryEntry::~DirectoryEntry(){
-    
+/* Destructors */
+DirectoryEntry::~DirectoryEntry()
+{
 }

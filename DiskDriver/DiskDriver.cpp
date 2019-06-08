@@ -98,10 +98,10 @@ DiskBlock *DiskDriver::getBlk(int blockNum)
 {
    return DiskMemAddr + blockNum;
 }
-void DiskDriver::readBlk(int blockNum)
+void DiskDriver::readBlk(int blockNum, DiskBlock *dst)
 {
    //TODO read到哪里呢？
-   //本来就在内存里emmm
+   memcpy(dst, DiskMemAddr + blockNum, DISK_BLOCK_SIZE);
 }
 void DiskDriver::writeBlk(int blockNum, const DiskBlock &blk)
 {

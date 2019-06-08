@@ -35,3 +35,8 @@ BufferCache &Kernel::getBufferCache()
 {
     return bufferCache;
 }
+
+SuperBlockCache &Kernel::getSuperBlockCache()
+{
+    return superBlockCache;
+}

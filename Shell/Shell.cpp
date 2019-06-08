@@ -1,4 +1,5 @@
 #include "../include/Shell.h"
+#include "../include/VirtualProcess.h"
 
 void Shell::help()
 {
@@ -74,7 +75,7 @@ void Shell::parseCmd()
         // cd();
         break;
     case LS:
-        // ls();
+        ls();
         break;
     case RM:
         // rm();
@@ -233,6 +234,23 @@ void Shell::lseek()
 {
     Logcat::log(TAG, "lseek EXEC");
 }
+
+/**
+ * ls函数可以带参数，也可以不带（curDir）
+ */
+void Shell::ls()
+{
+    if (getParam(1) == "\0")
+    {
+        //不带参数的ls，以curDir为默认参数
+        bounded_VFS->ls("/");
+    }
+    else
+    {
+        bounded_VFS->ls(VirtualProcess::Instance()->getUser().u_curdir);
+    }
+}
+
 Shell::Shell()
 {
     TAG = strdup("Shell");

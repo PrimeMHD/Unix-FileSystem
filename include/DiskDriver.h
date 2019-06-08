@@ -24,7 +24,7 @@ public:
   int mount();                                       //安装img磁盘
   void unmount();                                    //卸载磁盘
   DiskBlock *getBlk(int blockNum);                   //获得指向块的指针
-  void readBlk(int blockNum);                        //读取块
+  void readBlk(int blockNum, DiskBlock *dst);        //读取块
   void writeBlk(int blockNum, const DiskBlock &blk); //写入块
   bool isDiskMounted();
   DiskBlock *getDiskMemAddr();

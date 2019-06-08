@@ -12,6 +12,7 @@ class DiskInode
 {
 // 一个diskInode的大小为64B
 public:
+  DiskInode();
   DiskInode(unsigned int d_mode,int d_nlink,short d_uid,short d_gid,int d_size,int i_addr[10],int d_atime,int d_mtime);
   DiskInode(Inode inode); //转换构造函数
   unsigned int d_mode;

@@ -5,6 +5,7 @@ VirtualProcess VirtualProcess::instance;
 VirtualProcess::VirtualProcess()
 {
     //TODO 需要初始化VirtualProcess
+    strcpy(defaultUser.u_curdir, "/");
 }
 
 VirtualProcess::~VirtualProcess()

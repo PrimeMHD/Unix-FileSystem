@@ -16,7 +16,7 @@ void Ext2::format()
     //0# superblock
     //1,2,3# inodePool
     // 4~DISK_BLOCK_NUM-1# 放数据
-    void *diskMemAddr = (void *)Kernel::instance()->getDiskDriver().getDiskMemAddr();
+    DiskBlock *diskMemAddr = Kernel::instance()->getDiskDriver().getDiskMemAddr();
 
     //①构造一个superBlock结构，写入磁盘中
     SuperBlock tempSuperBlock;
@@ -33,20 +33,120 @@ void Ext2::format()
     tempSuperBlock.bsetOccupy(6); //6#盘块放etc目录文件
     tempSuperBlock.bsetOccupy(7); //7#盘块放home目录文件
     tempSuperBlock.bsetOccupy(8); //8#盘块放dev目录文件
-    tempSuperBlock.free_block_bum -= 9;
+    //tempSuperBlock.free_block_bum -= 9;
     tempSuperBlock.free_inode_num -= 5;
     SuperBlock *p_superBlock = (SuperBlock *)diskMemAddr;
     *p_superBlock = tempSuperBlock; //没有动态申请，不用管深浅拷贝
     p_superBlock++;
-    diskMemAddr = (void *)p_superBlock;
+    diskMemAddr = (DiskBlock *)p_superBlock;
+    //还要送一份到VFS中
+    Kernel::instance()->getSuperBlockCache().dirty = false;
+    Kernel::instance()->getSuperBlockCache().SuperBlockBlockNum = tempSuperBlock.SuperBlockBlockNum;
+    Kernel::instance()->getSuperBlockCache().free_inode_num = tempSuperBlock.free_inode_num; //空闲inode
+    Kernel::instance()->getSuperBlockCache().free_block_bum = tempSuperBlock.free_block_bum;
+    //空闲盘块数
+    Kernel::instance()->getSuperBlockCache().total_block_num = tempSuperBlock.total_block_num;     //总盘块数
+    Kernel::instance()->getSuperBlockCache().total_inode_num = tempSuperBlock.total_inode_num;     //总inode数
+    Kernel::instance()->getSuperBlockCache().disk_block_bitmap = tempSuperBlock.disk_block_bitmap; //用bitmap管理空闲盘块
+
     //②构造DiskInode,修改InodePool,将InodePool写入磁盘img
-    int tempAddr[10]={4,0,0,0,0,0,0,0,0,0};
-    DiskInode tempDiskInode = DiskInode(0, 1, VirtualProcess::Instance()->Getuid(), VirtualProcess::Instance()->Getgid(),6*sizeof(DirectoryEntry),tempAddr,TimeHelper::getCurTime(),TimeHelper::getCurTime());
+    InodePool tempInodePool;
+    int tempAddr[10] = {4, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    DiskInode tempDiskInode = DiskInode(Inode::IFDIR, 1, VirtualProcess::Instance()->Getuid(), VirtualProcess::Instance()->Getgid(), 6 * sizeof(DirectoryEntry), tempAddr, TimeHelper::getCurTime(), TimeHelper::getCurTime());
+    tempInodePool.iupdate(1, tempDiskInode);
+    //1#inode，是根目录
+    tempDiskInode.d_addr[0] = 5;
+    tempDiskInode.d_size = sizeof(DirectoryEntry) * 2;
+    tempInodePool.iupdate(2, tempDiskInode);
+    //2#inode，是bin
+    tempDiskInode.d_addr[0] = 6;
+    tempDiskInode.d_size = sizeof(DirectoryEntry) * 2;
+    tempInodePool.iupdate(3, tempDiskInode);
+    //3#inode，是etc
+    tempDiskInode.d_addr[0] = 7;
+    tempDiskInode.d_size = sizeof(DirectoryEntry) * 2;
+    tempInodePool.iupdate(4, tempDiskInode);
+    //4#inode，是home
+    tempDiskInode.d_addr[0] = 8;
+    tempDiskInode.d_size = sizeof(DirectoryEntry) * 2;
+    tempInodePool.iupdate(5, tempDiskInode);
+    //5#inode，是dev
+    InodePool *p_InodePool = (InodePool *)diskMemAddr;
+    *p_InodePool = tempInodePool;
+    p_InodePool++;
+    diskMemAddr = (DiskBlock *)p_InodePool;
 
-        //③数据区写入目录文件
+    //③数据区写入目录文件
+    DirectoryEntry *p_directoryEntry = (DirectoryEntry *)diskMemAddr;
+    DirectoryEntry tempDirctoryEntry;
+    strcpy(tempDirctoryEntry.m_name, ".");
+    tempDirctoryEntry.m_ino = 1;
+    *p_directoryEntry = tempDirctoryEntry;
+    p_directoryEntry++;
+    strcpy(tempDirctoryEntry.m_name, "..");
+    tempDirctoryEntry.m_ino = 1;
+    *p_directoryEntry = tempDirctoryEntry;
+    p_directoryEntry++;
+    strcpy(tempDirctoryEntry.m_name, "bin");
+    tempDirctoryEntry.m_ino = 2;
+    *p_directoryEntry = tempDirctoryEntry;
+    p_directoryEntry++;
+    strcpy(tempDirctoryEntry.m_name, "etc");
+    tempDirctoryEntry.m_ino = 3;
+    *p_directoryEntry = tempDirctoryEntry;
+    p_directoryEntry++;
+    strcpy(tempDirctoryEntry.m_name, "dev");
+    tempDirctoryEntry.m_ino = 4;
+    *p_directoryEntry = tempDirctoryEntry;
+    p_directoryEntry++;
+    strcpy(tempDirctoryEntry.m_name, "home");
+    tempDirctoryEntry.m_ino = 5;
+    *p_directoryEntry = tempDirctoryEntry;
 
-        ext2_status = Ext2_READY;
+    diskMemAddr++; //移动到下一个盘块，写bin目录
+    p_directoryEntry = (DirectoryEntry *)diskMemAddr;
+    strcpy(tempDirctoryEntry.m_name, ".");
+    tempDirctoryEntry.m_ino = 2;
+    *p_directoryEntry = tempDirctoryEntry;
+    p_directoryEntry++;
+    strcpy(tempDirctoryEntry.m_name, "..");
+    tempDirctoryEntry.m_ino = 1;
+    *p_directoryEntry = tempDirctoryEntry;
+
+    diskMemAddr++; //移动到下一个盘块，写etc目录
+    p_directoryEntry = (DirectoryEntry *)diskMemAddr;
+    strcpy(tempDirctoryEntry.m_name, ".");
+    tempDirctoryEntry.m_ino = 3;
+    *p_directoryEntry = tempDirctoryEntry;
+    p_directoryEntry++;
+    strcpy(tempDirctoryEntry.m_name, "..");
+    tempDirctoryEntry.m_ino = 1;
+    *p_directoryEntry = tempDirctoryEntry;
+
+    diskMemAddr++; //移动到下一个盘块，写dev目录
+    p_directoryEntry = (DirectoryEntry *)diskMemAddr;
+    strcpy(tempDirctoryEntry.m_name, ".");
+    tempDirctoryEntry.m_ino = 4;
+    *p_directoryEntry = tempDirctoryEntry;
+    p_directoryEntry++;
+    strcpy(tempDirctoryEntry.m_name, "..");
+    tempDirctoryEntry.m_ino = 1;
+    *p_directoryEntry = tempDirctoryEntry;
+
+    diskMemAddr++; //移动到下一个盘块，写home目录
+    p_directoryEntry = (DirectoryEntry *)diskMemAddr;
+    strcpy(tempDirctoryEntry.m_name, ".");
+    tempDirctoryEntry.m_ino = 5;
+    *p_directoryEntry = tempDirctoryEntry;
+    p_directoryEntry++;
+    strcpy(tempDirctoryEntry.m_name, "..");
+    tempDirctoryEntry.m_ino = 1;
+    *p_directoryEntry = tempDirctoryEntry;
+
+    //test:
+    //Kernel::instance()->getDiskDriver().unmount();
     //如果格式话成功，将ext2_status置ready
+    ext2_status = Ext2_READY;
 }
 
 int Ext2::registerFs()
@@ -65,16 +165,39 @@ int Ext2::registerFs()
     else if (mountRes == 0) //有现成的(认为已经格式化)  //NOTE 这里可以提升
     {
         ext2_status = Ext2_READY;
+        //NOTE 显然，如果是一个未格式话的磁盘，下面的操作没有意义。
+        //④装载SuperBlock到VFS的SuperBlock缓存(这一步需要经过缓存层)
+        SuperBlock tempSuperBlock; //从磁盘上读的先放到这个对象里（用于解析），然后再挪到vfs superblock
+        loadSuperBlock(tempSuperBlock);
+        //搬到vfs中的superBlockCache
+        SuperBlockCache &kernelSBC = Kernel::instance()->getSuperBlockCache();
+        kernelSBC.dirty = false;
+        kernelSBC.disk_block_bitmap = tempSuperBlock.disk_block_bitmap;
+        kernelSBC.free_block_bum = tempSuperBlock.free_block_bum;
+        kernelSBC.free_inode_num = tempSuperBlock.free_inode_num;
+        kernelSBC.total_block_num = tempSuperBlock.total_block_num;
+        kernelSBC.total_inode_num = tempSuperBlock.total_inode_num;
+        kernelSBC.SuperBlockBlockNum = tempSuperBlock.SuperBlockBlockNum;
+        // tempptr++;
+        // memcpy(tempptr, &tempSuperBlock, DISK_BLOCK_SIZE);
     }
     else if (mountRes == 1)
     { // 新生成的img，还有待格式化
 
-        //③ext模块中的指针赋值，指向img文件内存映射的地址。
+        //NO DO THIS//③ext模块中的指针赋值，指向img文件内存映射的地址。
         ext2_status = Ext2_NOFORM;
     }
 
-    //④装载SuperBlock到VFS的SuperBlock缓存(这一步需要经过缓存层)
     return OK;
+}
+
+void Ext2::loadSuperBlock(SuperBlock &superBlock)
+{
+    //User &u = VirtualProcess::Instance()->getUser();
+    Buf *pBuf;
+    pBuf = p_bufferCache->Bread(0);
+    memcpy(&superBlock, pBuf->b_addr, DISK_BLOCK_SIZE);
+    p_bufferCache->Brelse(pBuf);
 }
 
 int Ext2::setBufferCache(BufferCache *p_bufferCache)
