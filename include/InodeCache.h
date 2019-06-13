@@ -28,7 +28,7 @@ public:
   InodeCache() : inodeCacheBitmap(INODE_CACHE_SIZE) {}
   void clearCache();
   Inode *getInodeByID(int inodeID); //返回inodeCache块的缓存
-  int addInodeCache(DiskInode inode);
+  int addInodeCache(DiskInode inode, InodeId inodeId);
   int freeInodeCache(int inodeID);
   void replaceInodeCache(DiskInode inode, int replacedInodeID);
   int flushAllCacheDirtyInode();

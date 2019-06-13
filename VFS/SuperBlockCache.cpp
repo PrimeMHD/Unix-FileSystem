@@ -53,6 +53,7 @@ void SuperBlockCache::flushBack()
     tempSuperBlock.total_block_num = this->total_block_num;
     tempSuperBlock.total_inode_num = this->total_inode_num;
     tempSuperBlock.SuperBlockBlockNum = this->SuperBlockBlockNum;
+    memcpy(tempSuperBlock.s_inode, this->s_inode, sizeof(this->s_inode));
     Buf *pBuf = Kernel::instance()->getBufferCache().GetBlk(0);
     SuperBlock *p_superBlock = (SuperBlock *)pBuf->b_addr;
     *p_superBlock = tempSuperBlock; //没有动态申请，不用管深浅拷贝

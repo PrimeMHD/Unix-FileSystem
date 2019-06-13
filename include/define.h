@@ -35,6 +35,9 @@
 #define ERROR_LBN_OVERFLOW -5 //文件的逻辑块号大小溢出
 #define ERROR_PATH_NFOUND -6
 #define ERROR_OUTOF_INODE -7
+#define ERROR_OPEN_ILLEGAL -8
+#define ERROR_OUTOF_OPENFILE -9
+#define ERROR_OUTOF_FILEFD -10
 
 typedef int FileFd;  //文件句柄，实际上就是一个int
 typedef int InodeId; //inode号，实际上是一个int

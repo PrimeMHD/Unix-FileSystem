@@ -28,28 +28,28 @@ int Bitmap::setBit(int blockID)
     switch (innerPos)
     {
     case 0:
-        bitmap[elemPos] | 0x01;
+        bitmap[elemPos] |= 0x01;
         break;
     case 1:
-        bitmap[elemPos] | 0x02;
+        bitmap[elemPos] |= 0x02;
         break;
     case 2:
-        bitmap[elemPos] | 0x04;
+        bitmap[elemPos] |= 0x04;
         break;
     case 3:
-        bitmap[elemPos] | 0x08;
+        bitmap[elemPos] |= 0x08;
         break;
     case 4:
-        bitmap[elemPos] | 0x10;
+        bitmap[elemPos] |= 0x10;
         break;
     case 5:
-        bitmap[elemPos] | 0x20;
+        bitmap[elemPos] |= 0x20;
         break;
     case 6:
-        bitmap[elemPos] | 0x40;
+        bitmap[elemPos] |= 0x40;
         break;
     case 7:
-        bitmap[elemPos] | 0x80;
+        bitmap[elemPos] |= 0x80;
         break;
     default:
         //cannot be reached!
@@ -68,28 +68,28 @@ int Bitmap::unsetBit(int blockID)
     switch (innerPos)
     {
     case 0:
-        bitmap[elemPos] & 0xfe;
+        bitmap[elemPos] &= 0xfe;
         break;
     case 1:
-        bitmap[elemPos] & 0xfd;
+        bitmap[elemPos] &= 0xfd;
         break;
     case 2:
-        bitmap[elemPos] & 0xfb;
+        bitmap[elemPos] &= 0xfb;
         break;
     case 3:
-        bitmap[elemPos] & 0xf7;
+        bitmap[elemPos] &= 0xf7;
         break;
     case 4:
-        bitmap[elemPos] & 0xef;
+        bitmap[elemPos] &= 0xef;
         break;
     case 5:
-        bitmap[elemPos] & 0xdf;
+        bitmap[elemPos] &= 0xdf;
         break;
     case 6:
-        bitmap[elemPos] & 0xbf;
+        bitmap[elemPos] &= 0xbf;
         break;
     case 7:
-        bitmap[elemPos] & 0x7f;
+        bitmap[elemPos] &= 0x7f;
         break;
     default:
         //cannot be reached!
@@ -149,51 +149,51 @@ int Bitmap::getAFreeBitNum()
     {
         if (bitmap[i] != 0xFF)
         { //存在空位
-            if (~(bitmap[i] & 0x01))
+            if (!(bitmap[i] & 0x01)) 
             {
                 ret = i * BITMAP_PERBLOCK_SIZE + 0;
                 break;
             }
-            else if (~(bitmap[i] & 0x01))
+            else if (!(bitmap[i] & 0x02))
             {
                 ret = i * BITMAP_PERBLOCK_SIZE + 1;
                 break;
             }
-            else if (~(bitmap[i] & 0x02))
+            else if (!(bitmap[i] & 0x04))
             {
                 ret = i * BITMAP_PERBLOCK_SIZE + 2;
                 break;
             }
-            else if (~(bitmap[i] & 0x04))
+            else if (!(bitmap[i] & 0x08))
             {
                 ret = i * BITMAP_PERBLOCK_SIZE + 3;
                 break;
             }
-            else if (~(bitmap[i] & 0x08))
+            else if (!(bitmap[i] & 0x10))
             {
                 ret = i * BITMAP_PERBLOCK_SIZE + 4;
                 break;
             }
-            else if (~(bitmap[i] & 0x10))
+            else if (!(bitmap[i] & 0x20))
             {
                 ret = i * BITMAP_PERBLOCK_SIZE + 5;
                 break;
             }
-            else if (~(bitmap[i] & 0x20))
+            else if (!(bitmap[i] & 0x40))
             {
                 ret = i * BITMAP_PERBLOCK_SIZE + 6;
                 break;
             }
-            else if (~(bitmap[i] & 0x40))
+            else if (!(bitmap[i] & 0x80))
             {
                 ret = i * BITMAP_PERBLOCK_SIZE + 7;
                 break;
             }
-            else if (~(bitmap[i] & 0x80))
-            {
-                ret = i * BITMAP_PERBLOCK_SIZE + 8;
-                break;
-            }
+            // else if (~(bitmap[i] & 0x80))
+            // {
+            //     ret = i * BITMAP_PERBLOCK_SIZE + 8;
+            //     break;
+            // }
         }
     }
     return ret;

@@ -176,6 +176,7 @@ int Ext2::registerFs()
         kernelSBC.total_block_num = tempSuperBlock.total_block_num;
         kernelSBC.total_inode_num = tempSuperBlock.total_inode_num;
         kernelSBC.SuperBlockBlockNum = tempSuperBlock.SuperBlockBlockNum;
+        memcpy(kernelSBC.s_inode, tempSuperBlock.s_inode, sizeof(tempSuperBlock.s_inode));
         // tempptr++;
         // memcpy(tempptr, &tempSuperBlock, DISK_BLOCK_SIZE);
     }
@@ -191,7 +192,7 @@ int Ext2::registerFs()
 
 int Ext2::unregisterFs()
 {
-    p_bufferCache->Bflush();
+    p_bufferCache->unmount();
     ext2_status = Ext2_UNINITIALIZED;
     return OK;
 }

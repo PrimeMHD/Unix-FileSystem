@@ -7,6 +7,8 @@
 #include "BufferCache.h"
 #include "DirectoryCache.h"
 #include "SuperBlockCache.h"
+#include "File.h"
+#include "OpenFileTable.h"
 
 class Kernel
 {
@@ -22,6 +24,7 @@ private:
   VFS vfs;
 
 public:
+  OpenFileTable m_OpenFileTable;
   static Kernel *instance();
   VFS &getVFS();
   Ext2 &getExt2();

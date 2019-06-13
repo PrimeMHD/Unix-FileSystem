@@ -12,7 +12,8 @@ File::File()
 	this->f_count = 0;
 	this->f_flag = 0;
 	this->f_offset = 0;
-	this->f_inode = NULL;
+	//this->f_inode = NULL;
+	this->f_inode_id = 0;
 }
 
 File::~File()

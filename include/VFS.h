@@ -22,11 +22,11 @@ public:
   void unmount();
   int format();
   InodeId createFile(const char *fileName); //返回分配的Inode编号
-  int mkDir(const char *dirName);       //返回分配的Inode编号
-  int cd(const char *dirName);          //返回进入的dir的Inode
+  int mkDir(const char *dirName);           //返回分配的Inode编号
+  int cd(const char *dirName);              //返回进入的dir的Inode
   void ls(const char *dirName);
   void ls(InodeId dirInodeID);
-  int open(Path path);
+  int open(Path path, int mode);
   int close(int fd);
   int read(int fd, u_int8_t *content, int length);  //用户层面，文件必须先打开才可读
   int write(int fd, u_int8_t *content, int length); //用户层面，文件必须先打开才可写

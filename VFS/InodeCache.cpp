@@ -25,7 +25,7 @@ Inode *InodeCache::getInodeByID(int inodeID)
   }
 
   //没有在inodeCache中找到，需要从ext要，写入inodeCache
-  return &inodeCacheArea[addInodeCache((Kernel::instance()->getExt2().getDiskInodeByNum(inodeID)))];
+  return &inodeCacheArea[addInodeCache((Kernel::instance()->getExt2().getDiskInodeByNum(inodeID)), inodeID)];
 
 } //返回inodeCache块的缓存
 
@@ -36,7 +36,7 @@ Inode *InodeCache::getInodeByID(int inodeID)
  * addInodeCache返回值的含义：放入位置的下标
  * 
  */
-int InodeCache::addInodeCache(DiskInode inode)
+int InodeCache::addInodeCache(DiskInode inode, InodeId inodeId)
 {
   int pos = inodeCacheBitmap.getAFreeBitNum();
   if (pos < 0)
@@ -54,6 +54,7 @@ int InodeCache::addInodeCache(DiskInode inode)
     //②可能发生脏inode写回
 
     inodeCacheArea[pos] = Inode(inode);
+    inodeCacheArea[pos].i_number = inodeId;
     inodeCacheBitmap.setBit(pos);
     //③用新的inode覆盖掉
 
@@ -63,6 +64,7 @@ int InodeCache::addInodeCache(DiskInode inode)
   {
 
     inodeCacheArea[pos] = Inode(inode);
+    inodeCacheArea[pos].i_number = inodeId;
     inodeCacheBitmap.setBit(pos);
   }
   return pos;

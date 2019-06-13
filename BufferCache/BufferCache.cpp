@@ -14,7 +14,8 @@ int BufferCache::mount()
 }
 void BufferCache::unmount()
 {
-
+    Bflush();
+    diskDriver->unmount();
 } //unmount的时候需要把脏缓存刷回
 
 /**
@@ -140,9 +141,10 @@ void BufferCache::Bflush()
         if ((bp->b_flags & Buf::B_DELWRI))
         {
             //bwrite方法会清除B_DELWRI标志的
-            this->NotAvail(bp);
+            //this->NotAvail(bp);
             this->Bwrite(bp);
-            this->Brelse(bp);
+            //this->Brelse(bp);
+            std::cout<<bp->b_blkno<<std::endl;
         }
     }
 

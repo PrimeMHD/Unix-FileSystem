@@ -112,7 +112,7 @@ InodeId VFS::createFile(const char *fileName)
     p_inode->i_nlink = 1;
     p_inode->i_uid = VirtualProcess::Instance()->Getuid();
     p_inode->i_gid = VirtualProcess::Instance()->Getgid();
-
+    p_inode->i_number = newFileInode;
     //Step2:在当前目录文件中写入新的目录项
     Inode *p_dirInode = inodeCache->getInodeByID(VirtualProcess::Instance()->getUser().curDirInodeId);
     int blkno = p_dirInode->Bmap(0); //Bmap查物理块号
@@ -138,7 +138,8 @@ InodeId VFS::createFile(const char *fileName)
     {
         return ERROR_NOTSPEC;
     }
-    Kernel::instance()->getBufferCache().Brelse(pBuf);
+    Kernel::instance()->getBufferCache().Bdwrite(pBuf);
+    //Kernel::instance()->getBufferCache().Brelse(pBuf);
 
     //Step3:暂时未分配盘块
 
@@ -204,9 +205,39 @@ void VFS::ls(const char *dirName)
     ls(dirInodeId);
 }
 
-int VFS::open(Path path)
+/**
+ * 打开一个普通文件,返回文件的句柄
+ */
+FileFd VFS::open(Path path, int mode)
 {
-    return OK;
+    FileFd fd;
+    //Step1. 查找该文件的inode号
+    InodeId openFileInodeId = p_ext2->locateInode(path);
+    //Step2. 检查打开合法性(省略了文件本身读写的限定)
+    Inode *p_inodeOpenFile = inodeCache->getInodeByID(openFileInodeId);
+    if (p_inodeOpenFile->i_mode & Inode::IFMT != 0)
+    {
+        return ERROR_OPEN_ILLEGAL;
+    }
+    //Step3. 分配FILE结构
+    File *pFile = Kernel::instance()->m_OpenFileTable.FAlloc();
+    if (pFile == NULL)
+    {
+        //分配失败
+        return ERROR_OUTOF_OPENFILE;
+    }
+    //Step4. 建立钩连关系,u_ofile[]中的一项指向FILE
+    User &u = VirtualProcess::Instance()->getUser();
+    /* 在进程打开文件描述符表中获取一个空闲项 */
+    fd = u.u_ofiles.AllocFreeSlot();
+    if (fd < 0) /* 如果寻找空闲项失败 */
+    {
+        return ERROR_OUTOF_FILEFD;
+    }
+    u.u_ofiles.SetF(fd, pFile);
+    pFile->f_flag = mode & (File::FREAD | File::FWRITE);
+    pFile->f_inode_id = openFileInodeId; //NOTE 这里有没有问题？如果inode被替换出内存了呢？
+    return fd;
 }
 int VFS::close(int fd)
 {

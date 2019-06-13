@@ -239,6 +239,9 @@ void Shell::man()
 }
 void Shell::mexit()
 {
+    if(bounded_VFS->isMounted()){
+        bounded_VFS->unmount();
+    }
     Logcat::log(TAG, "exit EXEC");
 }
 //隐式调用
@@ -246,8 +249,14 @@ void Shell::creat()
 {
     Logcat::log(TAG, "creat EXEC");
 }
+
+/**
+ * 临时的，不应该是一个用户接口
+ */
 void Shell::open()
 {
+    Path path(getParam(1));
+    bounded_VFS->open(path, File::FREAD);
     Logcat::log(TAG, "open EXEC");
 }
 void Shell::close()
