@@ -63,28 +63,28 @@ void Shell::parseCmd()
     switch (getInstType())
     {
     case MOUNT:
-        mount();
+        mount(); //OK
         break;
     case UNMOUNT:
-        unmount();
+        unmount(); //OK
         break;
     case FORMAT:
-        format();
+        format(); //OK
         break;
     case CD:
-        cd();
+        cd(); //OK
         break;
     case LS:
-        ls();
+        ls(); //OK
         break;
     case RM:
         // rm();
         break;
     case MKDIR:
-        mkdir();
+        //mkdir();
         break;
     case TOUCH:
-        touch();
+        touch(); //OK
         break;
     case CLEAR:
         //clear();
@@ -97,6 +97,12 @@ void Shell::parseCmd()
         break;
     case VERSION:
         version();
+        break;
+    case STORE:
+        store();
+        break;
+    case WITHDRAW:
+        withdraw();
         break;
     default:
         printf("CMD NOT SUPPORTED!\n");
@@ -152,9 +158,12 @@ char *Shell::getParam(int i)
 /**
  * 获得参数的个数
  */
-int Shell::getParamAmount(){
-    for(int i=0;i<MAX_PARAM_NUM;i++){
-        if(!strcmp(split_cmd[i],"")){
+int Shell::getParamAmount()
+{
+    for (int i = 0; i < MAX_PARAM_NUM; i++)
+    {
+        if (!strcmp(split_cmd[i], ""))
+        {
             return i;
         }
     }
@@ -177,6 +186,7 @@ void Shell::mount()
 
 void Shell::unmount()
 {
+    bounded_VFS->unmount();
     Logcat::log(TAG, "unmount EXEC");
 }
 
@@ -206,6 +216,16 @@ void Shell::cat()
 }
 void Shell::touch()
 {
+    if (getParamAmount() != 2)
+    {
+        printf("ERROR!参数个数错误！");
+        return;
+    }
+    else
+    {
+        bounded_VFS->createFile(getParam(1));
+    }
+
     Logcat::log(TAG, "touch EXEC");
 }
 
@@ -247,20 +267,21 @@ void Shell::lseek()
     Logcat::log(TAG, "lseek EXEC");
 }
 
-
 /**
  * 用户指令：更改当前目录
  */
-void Shell::cd(){
+void Shell::cd()
+{
     //cd必须带参数
-    if (getParamAmount()!=2){
+    if (getParamAmount() != 2)
+    {
         printf("Error!cd命令参数个数错误！");
-    }else{
+    }
+    else
+    {
         bounded_VFS->cd(getParam(1));
     }
-
 }
-
 
 /**
  * ls函数可以带参数，也可以不带（curDir）
@@ -276,6 +297,20 @@ void Shell::ls()
     {
         bounded_VFS->ls(getParam(1)); //getParam(1)获得的是ls后面跟的目录名（可能是相对的也可能是绝对的）
     }
+}
+
+/**
+ * 将外部文件考入虚拟磁盘
+ */
+void Shell::store()
+{
+}
+
+/**
+ * 将文件从虚拟磁盘中拷出
+ */
+void Shell::withdraw()
+{
 }
 
 Shell::Shell()

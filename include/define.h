@@ -56,9 +56,11 @@ enum INSTRUCT
     CLEAR,
     HELP,
     EXIT,
-    VERSION
+    VERSION,
+    STORE,
+    WITHDRAW
 };
-const int INST_NUM = 13;
+const int INST_NUM = 15;
 //NOTE 注意，如果改了上面的枚举类型，那么下面的这个数字也需要相应修改
 
 static const char *instructStr[]{
@@ -74,7 +76,9 @@ static const char *instructStr[]{
     "clear",
     "help",
     "exit",
-    "version"};
+    "version",
+    "store",
+    "withdraw"};
 enum FileType
 {
     NORMAL_FILE,

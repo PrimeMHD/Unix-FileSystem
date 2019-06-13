@@ -45,6 +45,8 @@ public:
   void mexit();
   void ls();
   void cd();
+  void store();
+  void withdraw();
   //隐式调用
   void creat();
   void open();

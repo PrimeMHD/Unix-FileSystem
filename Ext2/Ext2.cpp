@@ -32,8 +32,6 @@ void Ext2::format()
     //tempSuperBlock.free_block_bum -= 9;
     tempSuperBlock.free_inode_num -= 5;
 
-
-    
     SuperBlock *p_superBlock = (SuperBlock *)diskMemAddr;
     *p_superBlock = tempSuperBlock; //没有动态申请，不用管深浅拷贝
     p_superBlock++;
@@ -47,6 +45,7 @@ void Ext2::format()
     Kernel::instance()->getSuperBlockCache().total_block_num = tempSuperBlock.total_block_num;     //总盘块数
     Kernel::instance()->getSuperBlockCache().total_inode_num = tempSuperBlock.total_inode_num;     //总inode数
     Kernel::instance()->getSuperBlockCache().disk_block_bitmap = tempSuperBlock.disk_block_bitmap; //用bitmap管理空闲盘块
+    memcpy(Kernel::instance()->getSuperBlockCache().s_inode, tempSuperBlock.s_inode, sizeof(tempSuperBlock.s_inode));
 
     //②构造DiskInode,修改InodePool,将InodePool写入磁盘img
     InodePool tempInodePool;
