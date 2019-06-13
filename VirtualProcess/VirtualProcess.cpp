@@ -1,12 +1,13 @@
 #include "../include/VirtualProcess.h"
-
+#include "../include/Path.h"
 VirtualProcess VirtualProcess::instance;
 
 VirtualProcess::VirtualProcess()
 {
     //TODO 需要初始化VirtualProcess
-    strcpy(defaultUser.u_curdir, "/");
-    defaultUser.curDirInodeId=1;
+    //strcpy(defaultUser.u_curdir, "/");
+    //defaultUser.u_curDir = Path("/");
+    defaultUser.curDirInodeId = 1;
 }
 
 VirtualProcess::~VirtualProcess()

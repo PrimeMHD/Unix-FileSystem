@@ -72,7 +72,7 @@ void Shell::parseCmd()
         format();
         break;
     case CD:
-        // cd();
+        cd();
         break;
     case LS:
         ls();
@@ -147,6 +147,18 @@ char *Shell::getInstStr()
 char *Shell::getParam(int i)
 {
     return split_cmd[i];
+}
+
+/**
+ * 获得参数的个数
+ */
+int Shell::getParamAmount(){
+    for(int i=0;i<MAX_PARAM_NUM;i++){
+        if(!strcmp(split_cmd[i],"")){
+            return i;
+        }
+    }
+    return MAX_PARAM_NUM;
 }
 
 void Shell::mount()
@@ -234,6 +246,21 @@ void Shell::lseek()
 {
     Logcat::log(TAG, "lseek EXEC");
 }
+
+
+/**
+ * 用户指令：更改当前目录
+ */
+void Shell::cd(){
+    //cd必须带参数
+    if (getParamAmount()!=2){
+        printf("Error!cd命令参数个数错误！");
+    }else{
+        bounded_VFS->cd(getParam(1));
+    }
+
+}
+
 
 /**
  * ls函数可以带参数，也可以不带（curDir）

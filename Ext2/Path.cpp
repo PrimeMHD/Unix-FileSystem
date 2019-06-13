@@ -1,11 +1,16 @@
 #include "../include/Path.h"
-
+Path::Path(){
+    memset(path,0,sizeof(path));
+    strcpy(path[0],"/");
+    from_root=true;
+    level=0;
+}
 Path::Path(const char *raw_path)
 {
     path_str = strdup(raw_path);
     if (path_str[0] == '/')
     {
-        temp_str = path_str + 1;
+        temp_str = path_str + 1; //跳过正斜
         from_root = true;
     }
     else
@@ -47,4 +52,9 @@ std::string Path::toString()
     }
     path_str.append(path[i]);
     return path_str;
+}
+
+const char *Path::getInodeName() const
+{
+    return path[level - 1];
 }

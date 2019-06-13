@@ -21,7 +21,7 @@ public:
   void mount();
   void unmount();
   int format();
-  int createFile(const char *fileName); //返回分配的Inode编号
+  InodeId createFile(const char *fileName); //返回分配的Inode编号
   int mkDir(const char *dirName);       //返回分配的Inode编号
   int cd(const char *dirName);          //返回进入的dir的Inode
   void ls(const char *dirName);
@@ -36,6 +36,7 @@ public:
   void bindInodeCache(InodeCache *inodeCache);
   void bindDirectoryInodeCache(DirectoryCache *directoryCache);
   bool isMounted();
+  //Path convertPathToAbsolute(Path &path);
 };
 
 #endif

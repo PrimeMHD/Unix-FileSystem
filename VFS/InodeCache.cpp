@@ -76,6 +76,7 @@ void InodeCache::replaceInodeCache(DiskInode inode, int replacedInodeID)
   //TODO 暂时好像没有需要
 }
 
+//TODO 这个函数的动机存疑。
 /**
  * 释放某指定inodeID的缓存.
  * 返回值：若为-1表示没找到要释放的
@@ -95,4 +96,24 @@ int InodeCache::freeInodeCache(int inodeID)
   }
 
   return -1; //表示没有找到要释放的。
+}
+
+/**
+ * 刷回所有的Inode缓存回磁盘（可能所谓刷回只是留在缓存中，
+ * 所以如果是卸载磁盘的话，刷回缓存是最后做的）
+ */
+int InodeCache::flushAllCacheDirtyInode()
+{
+  //遍历inodeCache，查找存在的并且是脏的inode
+  for (int i = 0; i < inodeCacheBitmap.getElemNum(); i++)
+  {
+    if (inodeCacheBitmap.getBitStat(i))
+    { //该inode缓存有意义
+      if (inodeCacheArea[i].i_flag & (Inode::IUPD | Inode::IACC))
+      {
+        Kernel::instance()->getExt2().updateDiskInode(inodeCacheArea[i].i_number, inodeCacheArea[i]);
+      }
+    }
+  }
+  return OK;
 }

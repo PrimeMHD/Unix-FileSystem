@@ -28,6 +28,7 @@ public:
   DiskDriver &getDiskDriver();
   BufferCache &getBufferCache();
   SuperBlockCache &getSuperBlockCache();
+  InodeCache &getInodeCache();
 };
 
 #endif

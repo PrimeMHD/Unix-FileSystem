@@ -31,6 +31,7 @@ public:
   int addInodeCache(DiskInode inode);
   int freeInodeCache(int inodeID);
   void replaceInodeCache(DiskInode inode, int replacedInodeID);
+  int flushAllCacheDirtyInode();
 };
 
 #endif

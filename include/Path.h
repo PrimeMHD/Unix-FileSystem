@@ -17,8 +17,10 @@ public:
     bool from_root;
     int level;
     //Operations:
+    Path();
     explicit Path(const char *raw_path); //explicit关键字避免隐式类型转换
     bool isSingleName() const;
     std::string toString();
+    const char *getInodeName() const;
 };
 #endif //PATH_H

@@ -40,3 +40,8 @@ SuperBlockCache &Kernel::getSuperBlockCache()
 {
     return superBlockCache;
 }
+
+InodeCache &Kernel::getInodeCache()
+{
+    return inodeCache;
+}

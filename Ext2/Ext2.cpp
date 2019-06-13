@@ -18,8 +18,8 @@ void Ext2::format()
     SuperBlock tempSuperBlock;
     tempSuperBlock.total_block_num = DISK_BLOCK_NUM;
     tempSuperBlock.free_block_bum = DISK_BLOCK_NUM;
-    tempSuperBlock.total_inode_num = MAX_INODE_NUM;
-    tempSuperBlock.free_inode_num = MAX_INODE_NUM;
+    // tempSuperBlock.total_inode_num = MAX_INODE_NUM;
+    // tempSuperBlock.free_inode_num = MAX_INODE_NUM;
     tempSuperBlock.bsetOccupy(0); //0#盘块被superblock占据
     tempSuperBlock.bsetOccupy(1);
     tempSuperBlock.bsetOccupy(2);
@@ -31,6 +31,9 @@ void Ext2::format()
     tempSuperBlock.bsetOccupy(8); //8#盘块放dev目录文件
     //tempSuperBlock.free_block_bum -= 9;
     tempSuperBlock.free_inode_num -= 5;
+
+
+    
     SuperBlock *p_superBlock = (SuperBlock *)diskMemAddr;
     *p_superBlock = tempSuperBlock; //没有动态申请，不用管深浅拷贝
     p_superBlock++;
@@ -187,6 +190,13 @@ int Ext2::registerFs()
     return OK;
 }
 
+int Ext2::unregisterFs()
+{
+    p_bufferCache->Bflush();
+    ext2_status = Ext2_UNINITIALIZED;
+    return OK;
+}
+
 void Ext2::loadSuperBlock(SuperBlock &superBlock)
 {
     //User &u = VirtualProcess::Instance()->getUser();
@@ -234,25 +244,80 @@ DiskInode Ext2::getDiskInodeByNum(int inodeID)
 }
 
 /**
- * VFS在inodeDirectoryCache失效的时候，会调用本函数，在磁盘上根据路径确定inode号
+ * 功能：根据路径，做线性目录搜索
+ * VFS在inodeDirectoryCache失效的时候，会调用本函数，在磁盘上根据路径确定inode号。
+ * 
  */
-InodeId Ext2::locateInode(Path path)
+InodeId Ext2::locateInode(Path &path)
 {
-    return OK;
+
+    InodeId dirInodeId = locateDir(path); //先确定其父目录的inode号
+    if (path.level == 0)
+    {
+        return ROOT_INODE_ID;
+    }
+    else
+    {
+        return getInodeIdInDir(dirInodeId, path.getInodeName());
+    }
 }
 
 /**
- * VFS在inodeDirectoryCache失效的时候，会调用本函数，在磁盘上根据路径确定inode号
+ * VFS在inodeDirectoryCache失效的时候，会调用本函数，在磁盘上根据路径确定
+ * 一个路径截至最后一层之前的目录inode号
  */
-InodeId Ext2::locateDir(Path path)
+InodeId Ext2::locateDir(Path &path)
 {
-    return OK;
+
+    InodeId dirInode;   //目录文件的inode号
+    if (path.from_root) //如果是绝对路径,从根inode开始搜索
+    {
+        dirInode = ROOT_INODE_ID;
+    }
+    else //如果是相对路径，从当前inode号开始搜索
+    {
+        dirInode = VirtualProcess::Instance()->getUser().curDirInodeId;
+    }
+
+    for (int i = 0; i < path.level - 1; i++)
+    {
+        dirInode = getInodeIdInDir(dirInode, path.path[i]);
+        if (dirInode < 0)
+        {
+            return ERROR_PATH_NFOUND; //没有找到
+        }
+    }
+
+    return dirInode;
 }
 
-//根据目录的inode和文件名，在目录表中查找
+/**
+ * 线性目录搜索的步骤：根据文件名在目录文件（已知inode号）中查找inode号。
+ * 可以知道目录搜索的起点一定是已知的inode号，要么是cur要么是ROOT
+ */
 InodeId Ext2::getInodeIdInDir(InodeId dirInodeId, FileName fileName)
 {
-    return OK;
+    //Step1:先根据目录inode号dirInodeId获得目录inode对象
+    Inode *p_dirInode = Kernel::instance()->getInodeCache().getInodeByID(dirInodeId);
+    //TODO 错误处理
+    //Step2：读取该inode指示的数据块
+    int blkno = p_dirInode->Bmap(0); //Bmap查物理块号
+    Buf *pBuf;
+    pBuf = Kernel::instance()->getBufferCache().Bread(blkno);
+    DirectoryEntry *p_directoryEntry = (DirectoryEntry *)pBuf->b_addr;
+    //Step3：访问这个目录文件中的entry，搜索（同时缓存到dentryCache中）
+    //TODO 缓存到dentryCache中
+    for (int i = 0; i < DISK_BLOCK_SIZE / sizeof(DirectoryEntry); i++)
+    {
+        if ((p_directoryEntry->m_ino != 0) && (!strcmp(p_directoryEntry->m_name, fileName)))
+        {
+            return p_directoryEntry->m_ino;
+        } //ino==0表示该文件被删除
+        p_directoryEntry++;
+    }
+
+    Kernel::instance()->getBufferCache().Brelse(pBuf);
+    return -1;
 }
 
 int Ext2::bmap(int inodeNum, int logicBlockNum)

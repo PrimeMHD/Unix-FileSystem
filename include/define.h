@@ -33,6 +33,8 @@
 #define ERROR_NOTSPEC -1 //并不想指明哪一种错误，但是是错误
 #define ERROR_CANCEL -2
 #define ERROR_LBN_OVERFLOW -5 //文件的逻辑块号大小溢出
+#define ERROR_PATH_NFOUND -6
+#define ERROR_OUTOF_INODE -7
 
 typedef int FileFd;  //文件句柄，实际上就是一个int
 typedef int InodeId; //inode号，实际上是一个int

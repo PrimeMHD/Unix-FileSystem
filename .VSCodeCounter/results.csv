@@ -1,52 +1,55 @@
-filename, language, C++, Makefile, comment, blank, total
-BufferCache/BufferBlock.cpp, C++, 6, 0, 3, 2, 11
-BufferCache/BufferBlock.h, C++, 13, 0, 3, 5, 21
-BufferCache/BufferCache.cpp, C++, 31, 0, 3, 7, 41
-BufferCache/BufferCache.h, C++, 20, 0, 3, 12, 35
-BufferCache/LRU_list.cpp, C++, 51, 0, 3, 8, 62
-BufferCache/LRU_list.h, C++, 19, 0, 3, 13, 35
-BufferCache/Update.h, C++, 34, 0, 4, 8, 46
-DeviceManager.cpp, C++, 115, 0, 5, 26, 146
-DeviceManager.h, C++, 45, 0, 7, 36, 88
-DiskDriver/DiskDriver.cpp, C++, 71, 0, 6, 13, 90
-DiskDriver/DiskDriver.h, C++, 20, 0, 3, 14, 37
-Ext2/Bitmap.cpp, C++, 42, 0, 3, 9, 54
-Ext2/Bitmap.h, C++, 15, 0, 3, 11, 29
-Ext2/Block.cpp, C++, 41, 0, 3, 8, 52
-Ext2/Block.h, C++, 14, 0, 3, 10, 27
-Ext2/Ext2.cpp, C++, 99, 0, 11, 23, 133
-Ext2/Ext2.h, C++, 40, 0, 3, 28, 71
-Ext2/GroupDescriptor.cpp, C++, 1, 0, 3, 2, 6
-Ext2/GroupDescriptor.h, C++, 12, 0, 3, 5, 20
-Ext2/Inode.cpp, C++, 1, 0, 3, 2, 6
-Ext2/Inode.h, C++, 10, 0, 3, 5, 18
-Ext2/Item.cpp, C++, 4, 0, 3, 2, 9
-Ext2/Item.h, C++, 10, 0, 3, 7, 20
-Ext2/SuperBlock.cpp, C++, 1, 0, 3, 2, 6
-Ext2/SuperBlock.h, C++, 13, 0, 3, 4, 20
-Ext2/Table.cpp, C++, 9, 0, 3, 3, 15
-Ext2/Table.h, C++, 11, 0, 3, 7, 21
-LogUtil.cpp, C++, 12, 0, 3, 7, 22
-LogUtil.h, C++, 11, 0, 3, 9, 23
-Manipulate.cpp, C++, 144, 0, 13, 23, 180
-Manipulate.h, C++, 39, 0, 3, 31, 73
-Path.cpp, C++, 46, 0, 3, 9, 58
-Path.h, C++, 18, 0, 3, 13, 34
-SplitInst.cpp, C++, 45, 0, 3, 9, 57
-SplitInst.h, C++, 18, 0, 3, 11, 32
-VFS/BlockRegister.cpp, C++, 1, 0, 3, 2, 6
-VFS/BlockRegister.h, C++, 5, 0, 3, 4, 12
-VFS/DirectoryCache.cpp, C++, 1, 0, 3, 2, 6
-VFS/DirectoryCache.h, C++, 5, 0, 3, 4, 12
-VFS/InodeCache.cpp, C++, 1, 0, 3, 2, 6
-VFS/InodeCache.h, C++, 5, 0, 3, 5, 13
-VFS/InodeLinkList.cpp, C++, 1, 0, 3, 2, 6
-VFS/InodeLinkList.h, C++, 9, 0, 3, 5, 17
-VFS/VFS.cpp, C++, 118, 0, 3, 26, 147
-VFS/VFS.h, C++, 28, 0, 3, 22, 53
-define.h, C++, 154, 0, 9, 31, 194
-display.cpp, C++, 4, 0, 3, 3, 10
-display.h, C++, 8, 0, 3, 6, 17
-main.cpp, C++, 27, 0, 0, 9, 36
-makefile, Makefile, 0, 2, 0, 1, 3
-Total, -, 1448, 2, 178, 508, 2136
+filename, language, C++, Markdown, Makefile, comment, blank, total
+BufferCache/Buf.cpp, C++, 1, 0, 0, 1, 0, 2
+BufferCache/BufferCache.cpp, C++, 128, 0, 0, 57, 28, 213
+BufferCache/BufferLruList.cpp, C++, 0, 0, 0, 0, 1, 1
+DiskDriver/DiskBlock.cpp, C++, 1, 0, 0, 0, 0, 1
+DiskDriver/DiskDriver.cpp, C++, 83, 0, 0, 27, 8, 118
+Ext2/DiskInode.cpp, C++, 35, 0, 0, 14, 3, 52
+Ext2/Ext2.cpp, C++, 205, 0, 0, 49, 23, 277
+Ext2/InodePool.cpp, C++, 23, 0, 0, 19, 5, 47
+Ext2/Path.cpp, C++, 48, 0, 0, 0, 2, 50
+Ext2/SuperBlock.cpp, C++, 27, 0, 0, 7, 4, 38
+README.md, Markdown, 0, 1, 0, 0, 0, 1
+Shell/Shell.cpp, C++, 194, 0, 0, 48, 25, 267
+Utils/Bitmap.cpp, C++, 185, 0, 0, 18, 9, 212
+Utils/Logcat.cpp, C++, 9, 0, 0, 0, 4, 13
+Utils/TimeHelper.cpp, C++, 7, 0, 0, 0, 2, 9
+VFS/DirectoryCache.cpp, C++, 7, 0, 0, 3, 1, 11
+VFS/DirectoryEntry.cpp, C++, 8, 0, 0, 2, 2, 12
+VFS/File.cpp, C++, 62, 0, 0, 15, 16, 93
+VFS/Inode.cpp, C++, 45, 0, 0, 128, 16, 189
+VFS/InodeCache.cpp, C++, 67, 0, 0, 39, 13, 119
+VFS/SuperBlockCache.cpp, C++, 49, 0, 0, 10, 7, 66
+VFS/VFS.cpp, C++, 154, 0, 0, 21, 12, 187
+VirtualProcess/Kernel.cpp, C++, 38, 0, 0, 0, 5, 43
+VirtualProcess/User.cpp, C++, 1, 0, 0, 0, 0, 1
+VirtualProcess/VirtualProcess.cpp, C++, 26, 0, 0, 4, 7, 37
+include/Bitmap.h, C++, 19, 0, 0, 6, 1, 26
+include/Buf.h, C++, 33, 0, 0, 9, 4, 46
+include/BufferCache.h, C++, 33, 0, 0, 4, 3, 40
+include/BufferLruList.h, C++, 6, 0, 0, 1, 4, 11
+include/DirectoryCache.h, C++, 16, 0, 0, 3, 5, 24
+include/DirectoryEntry.h, C++, 14, 0, 0, 5, 4, 23
+include/DiskBlock.h, C++, 9, 0, 0, 1, 4, 14
+include/DiskDriver.h, C++, 24, 0, 0, 6, 3, 33
+include/DiskInode.h, C++, 21, 0, 0, 10, 4, 35
+include/Ext2.h, C++, 35, 0, 0, 5, 4, 44
+include/File.h, C++, 46, 0, 0, 43, 14, 103
+include/Inode.h, C++, 43, 0, 0, 10, 6, 59
+include/InodeCache.h, C++, 20, 0, 0, 12, 5, 37
+include/InodePool.h, C++, 18, 0, 0, 11, 8, 37
+include/Kernel.h, C++, 30, 0, 0, 0, 4, 34
+include/Logcat.h, C++, 14, 0, 0, 0, 4, 18
+include/Path.h, C++, 17, 0, 0, 5, 2, 24
+include/Shell.h, C++, 48, 0, 0, 5, 4, 57
+include/SuperBlock.h, C++, 20, 0, 0, 9, 3, 32
+include/SuperBlockCache.h, C++, 21, 0, 0, 1, 4, 26
+include/TimeHelper.h, C++, 9, 0, 0, 0, 3, 12
+include/User.h, C++, 23, 0, 0, 9, 6, 38
+include/VFS.h, C++, 38, 0, 0, 0, 3, 41
+include/VirtualProcess.h, C++, 18, 0, 0, 15, 11, 44
+include/define.h, C++, 74, 0, 0, 8, 8, 90
+main.cpp, C++, 15, 0, 0, 1, 5, 21
+makefile, Makefile, 0, 0, 7, 1, 3, 11
+工程笔记.md, Markdown, 0, 125, 0, 0, 86, 211
+Total, -, 2067, 126, 7, 642, 408, 3250

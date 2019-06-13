@@ -1,4 +1,6 @@
 #include "../include/SuperBlockCache.h"
+#include "../include/SuperBlock.h"
+#include "../include/Kernel.h"
 
 SuperBlockCache::SuperBlockCache() : disk_block_bitmap(DISK_SIZE / DISK_BLOCK_SIZE)
 {
@@ -41,4 +43,42 @@ void SuperBlockCache::bsetOccupy(BlkNum blkNum)
         disk_block_bitmap.setBit(blkNum);
         free_block_bum--;
     }
+}
+void SuperBlockCache::flushBack()
+{
+    SuperBlock tempSuperBlock;
+    tempSuperBlock.disk_block_bitmap = this->disk_block_bitmap;
+    tempSuperBlock.free_block_bum = this->free_block_bum;
+    tempSuperBlock.free_inode_num = this->free_inode_num;
+    tempSuperBlock.total_block_num = this->total_block_num;
+    tempSuperBlock.total_inode_num = this->total_inode_num;
+    tempSuperBlock.SuperBlockBlockNum = this->SuperBlockBlockNum;
+    Buf *pBuf = Kernel::instance()->getBufferCache().GetBlk(0);
+    SuperBlock *p_superBlock = (SuperBlock *)pBuf->b_addr;
+    *p_superBlock = tempSuperBlock; //没有动态申请，不用管深浅拷贝
+    Kernel::instance()->getBufferCache().Bdwrite(pBuf);
+
+    //下面是硬写入（不经过缓存）
+    // DiskBlock *diskMemAddr = Kernel::instance()->getDiskDriver().getDiskMemAddr();
+    // SuperBlock *p_superBlock = (SuperBlock *)diskMemAddr;
+    // *p_superBlock = tempSuperBlock; //没有动态申请，不用管深浅拷贝
+}
+
+InodeId SuperBlockCache::ialloc()
+{
+    dirty = true;
+    if (free_inode_num != 0)
+    {
+        return s_inode[--free_inode_num];
+    }
+    else
+    {
+        return ERROR_OUTOF_INODE;
+    }
+}
+void SuperBlockCache::ifree(InodeId inodeId)
+{
+    dirty = true;
+
+    s_inode[free_inode_num++] = inodeId;
 }

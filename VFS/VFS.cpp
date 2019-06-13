@@ -1,6 +1,7 @@
 #include "../include/VFS.h"
 #include "../include/Logcat.h"
 #include "../include/Kernel.h"
+#include "../include/VirtualProcess.h"
 VFS::VFS()
 {
 }
@@ -28,6 +29,21 @@ void VFS::mount()
 }
 void VFS::unmount()
 {
+    if (!Mounted)
+    {
+        printf("ERROR!磁盘未装载，无需卸载！\n");
+    }
+    else
+    {
+        //刷回InodeCache,SuperBlockCache
+        inodeCache->flushAllCacheDirtyInode();
+        if (superBlockCache->dirty)
+        {
+            superBlockCache->flushBack();
+        }
+        p_ext2->unregisterFs();
+        //刷回磁盘缓存
+    }
 }
 
 int VFS::format()
@@ -75,9 +91,58 @@ int VFS::format()
     }
     return OK;
 }
-int VFS::createFile(const char *fileName)
+/**
+ * 在当前目录下创建文件，
+ * 文件名为fileName,返回新创建文件的inodeId
+ */
+InodeId VFS::createFile(const char *fileName)
 {
-    return OK;
+    InodeId newFileInode = -1;
+
+    //Step1:为新文件分配新inode
+    newFileInode = superBlockCache->ialloc(); //得到inode号
+    if (newFileInode <= 0)
+    {
+        return newFileInode;
+    }
+    Inode *p_inode = inodeCache->getInodeByID(newFileInode); //并将这个inode写入inodeCache
+    p_inode->i_flag = Inode::IUPD | Inode::IACC;
+    p_inode->i_size = 0;
+    p_inode->i_mode = 0;
+    p_inode->i_nlink = 1;
+    p_inode->i_uid = VirtualProcess::Instance()->Getuid();
+    p_inode->i_gid = VirtualProcess::Instance()->Getgid();
+
+    //Step2:在当前目录文件中写入新的目录项
+    Inode *p_dirInode = inodeCache->getInodeByID(VirtualProcess::Instance()->getUser().curDirInodeId);
+    int blkno = p_dirInode->Bmap(0); //Bmap查物理块号
+    Buf *pBuf;
+    pBuf = Kernel::instance()->getBufferCache().Bread(blkno);
+    DirectoryEntry *p_directoryEntry = (DirectoryEntry *)pBuf->b_addr;
+
+    int i;
+    for (i = 0; i < DISK_BLOCK_SIZE / sizeof(DirectoryEntry); i++)
+    {
+        if ((p_directoryEntry->m_ino == 0)) //找到目录文件中可以见缝插针的地方，填入县创建的inode信息
+        {
+
+            p_directoryEntry->m_ino = newFileInode;
+            strcpy(p_directoryEntry->m_name, fileName);
+            //std::cout << p_directoryEntry->m_name << " ";
+            break;
+        } //ino==0表示该文件被删除
+
+        p_directoryEntry++;
+    }
+    if (i == DISK_BLOCK_SIZE / sizeof(DirectoryEntry))
+    {
+        return ERROR_NOTSPEC;
+    }
+    Kernel::instance()->getBufferCache().Brelse(pBuf);
+
+    //Step3:暂时未分配盘块
+
+    return newFileInode;
 }
 int VFS::mkDir(const char *dirName)
 {
@@ -85,6 +150,9 @@ int VFS::mkDir(const char *dirName)
 }
 int VFS::cd(const char *dirName)
 {
+    Path path(dirName);
+    VirtualProcess::Instance()->getUser().curDirInodeId = p_ext2->locateInode(path);
+    //df
     return OK;
 }
 
@@ -93,6 +161,12 @@ void VFS::ls(InodeId dirInodeID)
     //首先要获得这个inode->访问这个目录文件
     //step1: 检查inodeCache中有没有，有则直接用，没有则向Ext2模块要
     Inode &inode = *inodeCache->getInodeByID(dirInodeID);
+    if (inode.i_mode & Inode::IFMT != Inode::IFDIR)
+    {
+        printf("ERROR! ls的参数只能为空或者目录名！\n");
+        return;
+    }
+
     inode.i_flag |= Inode::IACC;
     //Step2：读这个目录文件到缓存块中（可能已经存在于缓存块中,规定目录文件不能超过4096B）
     int blkno = inode.Bmap(0); //Bmap查物理块号
@@ -101,11 +175,16 @@ void VFS::ls(InodeId dirInodeID)
     DirectoryEntry *p_directoryEntry = (DirectoryEntry *)pBuf->b_addr;
     //Step3：访问这个目录文件中的entry，打印出来（同时缓存到dentryCache中）
     //TODO 缓存到dentryCache中
-    while (strlen(p_directoryEntry->m_name) != 0)
+    for (int i = 0; i < DISK_BLOCK_SIZE / sizeof(DirectoryEntry); i++)
     {
-        printf("%s ", p_directoryEntry->m_name);
-    }
+        if ((p_directoryEntry->m_ino != 0))
+        {
+            std::cout << p_directoryEntry->m_name << " ";
+        } //ino==0表示该文件被删除
 
+        p_directoryEntry++;
+    }
+    std::cout << std::endl;
     Kernel::instance()->getBufferCache().Brelse(pBuf);
 }
 
@@ -121,6 +200,7 @@ void VFS::ls(const char *dirName)
 
     //没有，则向Ext模块要
     dirInodeId = p_ext2->locateInode(path);
+
     ls(dirInodeId);
 }
 
@@ -165,3 +245,11 @@ bool VFS::isMounted()
 {
     return Mounted;
 }
+
+// Path VFS::convertPathToAbsolute(Path &path){
+//     if(path.from_root){
+//         return path;
+//     }else{
+
+//     }
+// }
