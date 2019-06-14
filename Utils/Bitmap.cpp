@@ -107,28 +107,28 @@ bool Bitmap::getBitStat(int blockID)
     switch (innerPos)
     {
     case 0:
-        ret = (bitmap[elemPos] & 0x01 == 0) ? false : true;
+        ret = (bitmap[elemPos] & 0x01) ;
         break;
     case 1:
-        ret = (bitmap[elemPos] & 0x02 == 0) ? false : true;
+        ret = (bitmap[elemPos] & 0x02) ;
         break;
     case 2:
-        ret = (bitmap[elemPos] & 0x04 == 0) ? false : true;
+        ret = (bitmap[elemPos] & 0x04) ;
         break;
     case 3:
-        ret = (bitmap[elemPos] & 0x08 == 0) ? false : true;
+        ret = (bitmap[elemPos] & 0x08) ;
         break;
     case 4:
-        ret = (bitmap[elemPos] & 0x10 == 0) ? false : true;
+        ret = (bitmap[elemPos] & 0x10) ;
         break;
     case 5:
-        ret = (bitmap[elemPos] & 0x20 == 0) ? false : true;
+        ret = (bitmap[elemPos] & 0x20);
         break;
     case 6:
-        ret = (bitmap[elemPos] & 0x40 == 0) ? false : true;
+        ret = (bitmap[elemPos] & 0x40);
         break;
     case 7:
-        ret = (bitmap[elemPos] & 0x80 == 0) ? false : true;
+        ret = (bitmap[elemPos] & 0x80);
         break;
     default:
         //cannot be reached!

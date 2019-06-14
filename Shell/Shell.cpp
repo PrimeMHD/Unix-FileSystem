@@ -81,7 +81,7 @@ void Shell::parseCmd()
         // rm();
         break;
     case MKDIR:
-        //mkdir();
+        mkdir();
         break;
     case TOUCH:
         touch(); //OK
@@ -208,6 +208,12 @@ void Shell::format()
 }
 void Shell::mkdir()
 {
+    if(getParamAmount()==2){
+    bounded_VFS->mkDir(getParam(1));
+
+    }else{
+        Logcat::log("ERROR！MKDIR参数个数错误！");
+    }
     Logcat::log(TAG, "mkdir EXEC");
 }
 void Shell::cat()

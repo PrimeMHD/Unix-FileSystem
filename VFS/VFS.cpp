@@ -147,6 +147,25 @@ InodeId VFS::createFile(const char *fileName)
 }
 int VFS::mkDir(const char *dirName)
 {
+    int newDirInodeId=createFile(dirName);
+    Inode* p_inode=inodeCache->getInodeByID(newDirInodeId);
+    p_inode->i_mode=Inode::IFDIR;
+
+    DirectoryEntry tempDirectoryEntry;
+    Buf *pBuf;
+
+    BlkNum blkno=p_inode->Bmap(0);
+    pBuf = Kernel::instance()->getBufferCache().Bread(blkno);
+    DirectoryEntry *p_directoryEntry=(DirectoryEntry *)pBuf->b_addr;
+
+    strcpy(tempDirectoryEntry.m_name,".");
+    tempDirectoryEntry.m_ino=newDirInodeId;
+    *p_directoryEntry=tempDirectoryEntry;
+    p_directoryEntry++;
+    strcpy(tempDirectoryEntry.m_name,"..");
+    tempDirectoryEntry.m_ino=VirtualProcess::Instance()->getUser().curDirInodeId;
+    *p_directoryEntry=tempDirectoryEntry;
+    Kernel::instance()->getBufferCache().Bdwrite(pBuf);
     return OK;
 }
 int VFS::cd(const char *dirName)

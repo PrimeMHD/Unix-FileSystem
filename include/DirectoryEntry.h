@@ -1,6 +1,6 @@
 #ifndef DIRECTORY_ENTRY_H
 #define DIRECTORY_ENTRY_H
-
+#include "define.h"
 class DirectoryEntry
 {
 	/* static members */
@@ -10,6 +10,7 @@ public:
 	/* Functions */
 public:
 	/* Constructors */
+	//DirectoryEntry(int m_ino,char *name);
 	DirectoryEntry();
 	/* Destructors */
 	~DirectoryEntry();
