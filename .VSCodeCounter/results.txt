@@ -1,13 +1,13 @@
 Directory : /home/mi/Documents/Projects/CProject/Unix-FileSystem
-Date : 2019-06-13 22:49:37
-Total : 53 files,  2408 codes, 702 comments, 436 blanks, all 3546 lines
+Date : 2019-06-15 20:41:52
+Total : 55 files,  2624 codes, 803 comments, 462 blanks, all 3889 lines
 
 Languages
 +----------+------------+------------+------------+------------+------------+
 | language | files      | code       | comment    | blank      | total      |
 +----------+------------+------------+------------+------------+------------+
-| C++      |         50 |      2,275 |        701 |        347 |      3,323 |
-| Markdown |          2 |        126 |          0 |         86 |        212 |
+| C++      |         52 |      2,470 |        802 |        366 |      3,638 |
+| Markdown |          2 |        147 |          0 |         93 |        240 |
 | Makefile |          1 |          7 |          1 |          3 |         11 |
 +----------+------------+------------+------------+------------+------------+
 
@@ -15,13 +15,13 @@ Directories
 +-----------------------------------+------------+------------+------------+------------+------------+
 | path                              | files      | code       | comment    | blank      | total      |
 +-----------------------------------+------------+------------+------------+------------+------------+
-| .                                 |         53 |      2,408 |        702 |        436 |      3,546 |
-| include                           |         25 |        672 |        183 |        121 |        976 |
-| VFS                               |          7 |        459 |        239 |         81 |        779 |
-| Ext2                              |          5 |        408 |        108 |         45 |        561 |
-| Shell                             |          1 |        238 |         61 |         30 |        329 |
-| Utils                             |          3 |        201 |         18 |         15 |        234 |
-| BufferCache                       |          3 |        129 |         58 |         29 |        216 |
+| .                                 |         55 |      2,624 |        803 |        462 |      3,889 |
+| include                           |         26 |        698 |        204 |        121 |      1,023 |
+| VFS                               |          8 |        535 |        284 |         96 |        915 |
+| Ext2                              |          5 |        409 |        108 |         45 |        562 |
+| Shell                             |          1 |        322 |         89 |         35 |        446 |
+| Utils                             |          3 |        208 |         23 |         15 |        246 |
+| BufferCache                       |          3 |        130 |         60 |         28 |        218 |
 | DiskDriver                        |          2 |         84 |         27 |          8 |        119 |
 | VirtualProcess                    |          3 |         69 |          6 |         13 |         88 |
 +-----------------------------------+------------+------------+------------+------------+------------+
@@ -31,27 +31,28 @@ Files
 | filename                          | language | code       | comment    | blank      | total      |
 +-----------------------------------+----------+------------+------------+------------+------------+
 | BufferCache/Buf.cpp               | C++      |          1 |          1 |          0 |          2 |
-| BufferCache/BufferCache.cpp       | C++      |        128 |         57 |         28 |        213 |
+| BufferCache/BufferCache.cpp       | C++      |        129 |         59 |         27 |        215 |
 | BufferCache/BufferLruList.cpp     | C++      |          0 |          0 |          1 |          1 |
 | DiskDriver/DiskBlock.cpp          | C++      |          1 |          0 |          0 |          1 |
 | DiskDriver/DiskDriver.cpp         | C++      |         83 |         27 |          8 |        118 |
 | Ext2/DiskInode.cpp                | C++      |         35 |         14 |          3 |         52 |
-| Ext2/Ext2.cpp                     | C++      |        244 |         61 |         28 |        333 |
+| Ext2/Ext2.cpp                     | C++      |        245 |         61 |         28 |        334 |
 | Ext2/InodePool.cpp                | C++      |         23 |         19 |          5 |         47 |
 | Ext2/Path.cpp                     | C++      |         58 |          0 |          3 |         61 |
 | Ext2/SuperBlock.cpp               | C++      |         48 |         14 |          6 |         68 |
 | README.md                         | Markdown |          1 |          0 |          0 |          1 |
-| Shell/Shell.cpp                   | C++      |        238 |         61 |         30 |        329 |
-| Utils/Bitmap.cpp                  | C++      |        185 |         18 |          9 |        212 |
-| Utils/Logcat.cpp                  | C++      |          9 |          0 |          4 |         13 |
+| Shell/Shell.cpp                   | C++      |        322 |         89 |         35 |        446 |
+| Utils/Bitmap.cpp                  | C++      |        180 |         23 |          9 |        212 |
+| Utils/Logcat.cpp                  | C++      |         21 |          0 |          4 |         25 |
 | Utils/TimeHelper.cpp              | C++      |          7 |          0 |          2 |          9 |
 | VFS/DirectoryCache.cpp            | C++      |          7 |          3 |          1 |         11 |
-| VFS/DirectoryEntry.cpp            | C++      |          8 |          2 |          2 |         12 |
-| VFS/File.cpp                      | C++      |         62 |         15 |         16 |         93 |
+| VFS/DirectoryEntry.cpp            | C++      |          8 |          6 |          3 |         17 |
+| VFS/File.cpp                      | C++      |         62 |         16 |         16 |         94 |
 | VFS/Inode.cpp                     | C++      |         45 |        128 |         16 |        189 |
-| VFS/InodeCache.cpp                | C++      |         68 |         39 |         13 |        120 |
-| VFS/SuperBlockCache.cpp           | C++      |         66 |         10 |          9 |         85 |
-| VFS/VFS.cpp                       | C++      |        203 |         42 |         24 |        269 |
+| VFS/InodeCache.cpp                | C++      |         70 |         39 |         13 |        122 |
+| VFS/OpenFileTable.cpp             | C++      |         27 |         32 |          9 |         68 |
+| VFS/SuperBlockCache.cpp           | C++      |         67 |         10 |          9 |         86 |
+| VFS/VFS.cpp                       | C++      |        249 |         50 |         29 |        328 |
 | VirtualProcess/Kernel.cpp         | C++      |         42 |          0 |          6 |         48 |
 | VirtualProcess/User.cpp           | C++      |          1 |          0 |          1 |          2 |
 | VirtualProcess/VirtualProcess.cpp | C++      |         26 |          6 |          6 |         38 |
@@ -60,28 +61,29 @@ Files
 | include/BufferCache.h             | C++      |         33 |          4 |          3 |         40 |
 | include/BufferLruList.h           | C++      |          6 |          1 |          4 |         11 |
 | include/DirectoryCache.h          | C++      |         16 |          3 |          5 |         24 |
-| include/DirectoryEntry.h          | C++      |         14 |          5 |          4 |         23 |
+| include/DirectoryEntry.h          | C++      |         15 |          6 |          3 |         24 |
 | include/DiskBlock.h               | C++      |          9 |          1 |          4 |         14 |
 | include/DiskDriver.h              | C++      |         24 |          6 |          3 |         33 |
 | include/DiskInode.h               | C++      |         21 |         10 |          4 |         35 |
 | include/Ext2.h                    | C++      |         36 |          5 |          4 |         45 |
-| include/File.h                    | C++      |         46 |         43 |         14 |        103 |
+| include/File.h                    | C++      |         46 |         44 |         12 |        102 |
 | include/Inode.h                   | C++      |         43 |         10 |          6 |         59 |
 | include/InodeCache.h              | C++      |         20 |         12 |          5 |         37 |
 | include/InodePool.h               | C++      |         18 |         11 |          8 |         37 |
-| include/Kernel.h                  | C++      |         33 |          0 |          4 |         37 |
-| include/Logcat.h                  | C++      |         14 |          0 |          4 |         18 |
+| include/Kernel.h                  | C++      |         34 |          0 |          4 |         38 |
+| include/Logcat.h                  | C++      |         17 |          0 |          2 |         19 |
+| include/OpenFileTable.h           | C++      |         17 |         19 |          5 |         41 |
 | include/Path.h                    | C++      |         19 |          5 |          2 |         26 |
 | include/Shell.h                   | C++      |         52 |          5 |          4 |         61 |
 | include/SuperBlock.h              | C++      |         23 |          9 |          3 |         35 |
 | include/SuperBlockCache.h         | C++      |         25 |          1 |          4 |         30 |
 | include/TimeHelper.h              | C++      |          9 |          0 |          3 |         12 |
 | include/User.h                    | C++      |         22 |         13 |          6 |         41 |
-| include/VFS.h                     | C++      |         38 |          1 |          3 |         42 |
+| include/VFS.h                     | C++      |         39 |          1 |          3 |         43 |
 | include/VirtualProcess.h          | C++      |         18 |         15 |         11 |         44 |
-| include/define.h                  | C++      |         81 |          8 |          8 |         97 |
+| include/define.h                  | C++      |         84 |          8 |          8 |        100 |
 | main.cpp                          | C++      |         15 |          1 |          5 |         21 |
 | makefile                          | Makefile |          7 |          1 |          3 |         11 |
-| 工程笔记.md                           | Markdown |        125 |          0 |         86 |        211 |
-| Total                             |          |      2,408 |        702 |        436 |      3,546 |
+| 工程笔记.md                           | Markdown |        146 |          0 |         93 |        239 |
+| Total                             |          |      2,624 |        803 |        462 |      3,889 |
 +-----------------------------------+----------+------------+------------+------------+------------+

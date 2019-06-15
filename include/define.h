@@ -38,6 +38,7 @@
 #define ERROR_OPEN_ILLEGAL -8
 #define ERROR_OUTOF_OPENFILE -9
 #define ERROR_OUTOF_FILEFD -10
+#define ERROR_FILENAME_EXSIST -11
 
 typedef int FileFd;  //文件句柄，实际上就是一个int
 typedef int InodeId; //inode号，实际上是一个int

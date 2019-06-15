@@ -99,6 +99,14 @@ InodeId VFS::createFile(const char *fileName)
 {
     InodeId newFileInode = -1;
 
+    //Step0:查看有无同名的，若有则创建失败
+    Path path(fileName);
+    InodeId checkExsistInodeId = p_ext2->locateInode(path);
+    if (checkExsistInodeId > 0)
+    {
+        return ERROR_FILENAME_EXSIST;
+    }
+
     //Step1:为新文件分配新inode
     newFileInode = superBlockCache->ialloc(); //得到inode号
     if (newFileInode <= 0)
@@ -147,24 +155,29 @@ InodeId VFS::createFile(const char *fileName)
 }
 int VFS::mkDir(const char *dirName)
 {
-    int newDirInodeId=createFile(dirName);
-    Inode* p_inode=inodeCache->getInodeByID(newDirInodeId);
-    p_inode->i_mode=Inode::IFDIR;
+    int newDirInodeId = createFile(dirName);
+    if (newDirInodeId < 0)
+    {
+        return ERROR_FILENAME_EXSIST;
+    }
+
+    Inode *p_inode = inodeCache->getInodeByID(newDirInodeId);
+    p_inode->i_mode = Inode::IFDIR;
 
     DirectoryEntry tempDirectoryEntry;
     Buf *pBuf;
 
-    BlkNum blkno=p_inode->Bmap(0);
+    BlkNum blkno = p_inode->Bmap(0);
     pBuf = Kernel::instance()->getBufferCache().Bread(blkno);
-    DirectoryEntry *p_directoryEntry=(DirectoryEntry *)pBuf->b_addr;
+    DirectoryEntry *p_directoryEntry = (DirectoryEntry *)pBuf->b_addr;
 
-    strcpy(tempDirectoryEntry.m_name,".");
-    tempDirectoryEntry.m_ino=newDirInodeId;
-    *p_directoryEntry=tempDirectoryEntry;
+    strcpy(tempDirectoryEntry.m_name, ".");
+    tempDirectoryEntry.m_ino = newDirInodeId;
+    *p_directoryEntry = tempDirectoryEntry;
     p_directoryEntry++;
-    strcpy(tempDirectoryEntry.m_name,"..");
-    tempDirectoryEntry.m_ino=VirtualProcess::Instance()->getUser().curDirInodeId;
-    *p_directoryEntry=tempDirectoryEntry;
+    strcpy(tempDirectoryEntry.m_name, "..");
+    tempDirectoryEntry.m_ino = VirtualProcess::Instance()->getUser().curDirInodeId;
+    *p_directoryEntry = tempDirectoryEntry;
     Kernel::instance()->getBufferCache().Bdwrite(pBuf);
     return OK;
 }
@@ -236,7 +249,7 @@ FileFd VFS::open(Path path, int mode)
     Inode *p_inodeOpenFile = inodeCache->getInodeByID(openFileInodeId);
     if (p_inodeOpenFile->i_mode & Inode::IFMT != 0)
     {
-        return ERROR_OPEN_ILLEGAL;
+        return ERROR_OPEN_ILLEGAL; //在本程序中，只有普通文件可以open
     }
     //Step3. 分配FILE结构
     File *pFile = Kernel::instance()->m_OpenFileTable.FAlloc();
@@ -270,6 +283,15 @@ int VFS::write(int fd, u_int8_t *content, int length)
 {
     return OK;
 }
+
+/**
+ * 判断是否到达文件尾部
+ */
+bool VFS::eof(FileFd fd)
+{
+    return true;
+}
+
 void VFS::registerExt2(Ext2 *p_ext2)
 {
     this->p_ext2 = p_ext2;

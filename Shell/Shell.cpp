@@ -208,28 +208,37 @@ void Shell::format()
 }
 void Shell::mkdir()
 {
-    if(getParamAmount()==2){
-    bounded_VFS->mkDir(getParam(1));
-
-    }else{
+    if (getParamAmount() == 2)
+    {
+        if (bounded_VFS->mkDir(getParam(1)) < 0)
+        {
+            Logcat::log("ERROR!存在同名目录，创建失败！");
+        }
+    }
+    else
+    {
         Logcat::log("ERROR！MKDIR参数个数错误！");
     }
-    Logcat::log(TAG, "mkdir EXEC");
+    Logcat::devlog(TAG, "mkdir EXEC");
 }
 void Shell::cat()
 {
-    Logcat::log(TAG, "cat EXEC");
+    Logcat::devlog(TAG, "cat EXEC");
+    Logcat::devlog(TAG, "cat 暂不支持");
 }
 void Shell::touch()
 {
     if (getParamAmount() != 2)
     {
-        printf("ERROR!参数个数错误！");
+        Logcat::log("ERROR!参数个数错误！");
         return;
     }
     else
     {
-        bounded_VFS->createFile(getParam(1));
+        if (0 > bounded_VFS->createFile(getParam(1)))
+        {
+            Logcat::log("ERROR!存在同名文件，创建失败！");
+        }
     }
 
     Logcat::log(TAG, "touch EXEC");
@@ -237,7 +246,8 @@ void Shell::touch()
 
 void Shell::version()
 {
-    Logcat::log(TAG, "version EXEC");
+    system("cat version");
+    Logcat::devlog(TAG, "version EXEC");
 }
 void Shell::man()
 {
@@ -245,15 +255,18 @@ void Shell::man()
 }
 void Shell::mexit()
 {
-    if(bounded_VFS->isMounted()){
+    if (bounded_VFS->isMounted())
+    {
         bounded_VFS->unmount();
     }
-    Logcat::log(TAG, "exit EXEC");
+    Logcat::devlog(TAG, "exit EXEC");
+    Logcat::devlog("程序结束！");
+    exit(OK);
 }
 //隐式调用
 void Shell::creat()
 {
-    Logcat::log(TAG, "creat EXEC");
+    Logcat::devlog(TAG, "creat EXEC");
 }
 
 /**
@@ -265,18 +278,33 @@ void Shell::open()
     bounded_VFS->open(path, File::FREAD);
     Logcat::log(TAG, "open EXEC");
 }
+/**
+ * 临时的，不应该是一个用户接口
+ */
 void Shell::close()
 {
     Logcat::log(TAG, "close EXEC");
 }
+
+/**
+ * 临时的，不应该是一个用户接口
+ */
 void Shell::read()
 {
     Logcat::log(TAG, "read EXEC");
 }
+
+/**
+ * 临时的，不应该是一个用户接口
+ */
 void Shell::write()
 {
     Logcat::log(TAG, "write EXEC");
 }
+
+/**
+ * 临时的，不应该是一个用户接口
+ */
 void Shell::lseek()
 {
     Logcat::log(TAG, "lseek EXEC");
@@ -315,17 +343,91 @@ void Shell::ls()
 }
 
 /**
- * 将外部文件考入虚拟磁盘
+ * 将外部文件考入虚拟磁盘.带两个命令参数
+ * Usage: store [src path] [des filename]
  */
 void Shell::store()
 {
+    if (getParamAmount() == 3)
+    {
+        InodeId desInodeId;
+        //STORE的步骤
+        //Step1：创建文件（如果有同名的返回失败）
+        desInodeId = bounded_VFS->createFile(getParam(2));
+        if (desInodeId < 0)
+        {
+            Logcat::log("ERROR!目标文件名已存在！");
+            return;
+        }
+        //Step2：打开文件
+        Path desPath(getParam(2));
+        FileFd fd_des = bounded_VFS->open(desPath, File::FWRITE);
+        //Step3：写入文件
+        FILE *fd_src = fopen(getParam(1), "rb");
+        if (fd_src == NULL)
+        {
+            Logcat::log("源文件打开失败！");
+            return;
+        }
+        DiskBlock tempBuf;
+        while (!feof(fd_src))
+        {
+            //int blkCount = 0;
+            fread(&tempBuf, DISK_BLOCK_SIZE, 1, fd_src);
+            bounded_VFS->write(fd_des, (u_int8_t *)&tempBuf, DISK_BLOCK_SIZE);
+        }
+        //Step4：关闭文件
+        fclose(fd_src);
+        bounded_VFS->close(fd_des);
+    }
+    else
+    {
+        Logcat::log("ERROR!store命令参数个数错误");
+    }
 }
 
 /**
  * 将文件从虚拟磁盘中拷出
+ * Usage: withdraw [src filename] [des outer_path]
  */
 void Shell::withdraw()
 {
+    if (getParamAmount() == 3)
+    {
+        InodeId desInodeId;
+        //WITHDRAW的步骤
+        //Step1：创建文件（如果有同名的返回失败）
+        FILE *fd_des = fopen(getParam(2), "wb");
+        if (fd_des == NULL)
+        {
+            Logcat::log("目的文件创建失败！");
+            return;
+        }
+
+        //Step2：打开文件
+        Path srcPath(getParam(1));
+        FileFd fd_src = bounded_VFS->open(srcPath, File::FREAD);
+        if (fd_src < 0)
+        {
+            Logcat::log("源文件打开失败！");
+            return;
+        }
+        //Step3：写入文件
+        DiskBlock tempBuf;
+        while (!bounded_VFS->eof(fd_src))
+        {
+            //int blkCount = 0;
+            bounded_VFS->read(fd_src, (u_int8_t *)&tempBuf, DISK_BLOCK_SIZE);
+            fread(&tempBuf, DISK_BLOCK_SIZE, 1, fd_des);
+        }
+        //Step4：关闭文件
+        fclose(fd_des);
+        bounded_VFS->close(fd_src);
+    }
+    else
+    {
+        Logcat::log("ERROR!store命令参数个数错误");
+    }
 }
 
 Shell::Shell()
