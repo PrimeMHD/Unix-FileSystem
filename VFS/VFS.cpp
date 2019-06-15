@@ -305,9 +305,9 @@ int VFS::read(int fd, u_int8_t *content, int length)
     p_inode->i_flag |= Inode::IUPD;
     Buf *pBuf;
 
-    if (length > p_inode->i_size)
+    if (length > p_inode->i_size-p_file->f_offset+1)
     {
-        length = p_inode->i_size;
+        length = p_inode->i_size-p_file->f_offset+1;
     }
 
     while (readByteCount < length && p_file->f_offset <= p_inode->i_size) //NOTE 这里是<还是<=再考虑一下
@@ -351,9 +351,12 @@ int VFS::write(int fd, u_int8_t *content, int length)
     p_inode->i_flag |= Inode::IUPD;
 
     Buf *pBuf;
-    while (writeByteCount < length && p_file->f_offset <= p_inode->i_size) //NOTE 这里是<还是<=再考虑一下
+    while (writeByteCount < length ) //NOTE 这里是<还是<=再考虑一下
     {
         BlkNum logicBlkno = p_file->f_offset / DISK_BLOCK_SIZE; //逻辑盘块号
+        if(logicBlkno==1030){
+            printf("暂时停下");
+        }
         BlkNum phyBlkno = p_inode->Bmap(logicBlkno);            //物理盘块号
         int offsetInBlock = p_file->f_offset % DISK_BLOCK_SIZE; //块内偏移
         //NOTE:可能要先读后写！！！
@@ -402,7 +405,7 @@ bool VFS::eof(FileFd fd)
     User &u = VirtualProcess::Instance()->getUser();
     File *p_file = u.u_ofiles.GetF(fd);
     Inode *p_inode = inodeCache->getInodeByID(p_file->f_inode_id); //TODO错误处理?
-    if (p_file->f_offset == p_inode->i_size)
+    if (p_file->f_offset == p_inode->i_size+1)
         return true;
     else
         return false;

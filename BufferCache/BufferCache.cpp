@@ -191,7 +191,11 @@ Buf *BufferCache::GetBlk(int blkno)
     }
     /* 注意: 这里清除了所有其他位，只设了B_BUSY */
     bp->b_flags = Buf::B_BUSY; //若有延迟写bit，也一并消除了
+    if(blkno>1000000){
+        printf("看看你是什么妖精");
+    }
     bp->b_blkno = blkno;
+    memset(bp->b_addr,0,DISK_BLOCK_SIZE);
     return bp;
 }
 

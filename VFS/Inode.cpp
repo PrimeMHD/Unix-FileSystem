@@ -89,6 +89,9 @@ int Inode::Bmap(int lbn)
         Buf *pFirstBuf,*pSecondBuf;
         /* 计算逻辑块号lbn对应i_addr[]中的索引 */
 
+        // if(lbn==1048){
+        //     printf("终于等到你");
+        // }
         if (lbn < Inode::LARGE_FILE_BLOCK) // 大型文件
         {
             index = (lbn - Inode::SMALL_FILE_BLOCK) / Inode::ADDRESS_PER_INDEX_BLOCK + 6;
@@ -140,7 +143,7 @@ int Inode::Bmap(int lbn)
                     /* 分配一次间接索引表磁盘块失败，释放缓存中的二次间接索引表，然后返回 */
                     Kernel::instance()->getSuperBlockCache().bfree(newBlkNum);
                     //bufMgr.Brelse(pFirstBuf);
-                    return 0;
+                    return ERROR_OUTOF_BLOCK;
                 }
                 /* 将新分配的一次间接索引表磁盘块号，记入二次间接索引表相应项 */
                 iTable[index] = newBlkNum;
