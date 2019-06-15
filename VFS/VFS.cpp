@@ -251,6 +251,7 @@ FileFd VFS::open(Path path, int mode)
     {
         return ERROR_OPEN_ILLEGAL; //在本程序中，只有普通文件可以open
     }
+    p_inodeOpenFile->i_flag |= Inode::IACC;
     //Step3. 分配FILE结构
     File *pFile = Kernel::instance()->m_OpenFileTable.FAlloc();
     if (pFile == NULL)
@@ -271,17 +272,126 @@ FileFd VFS::open(Path path, int mode)
     pFile->f_inode_id = openFileInodeId; //NOTE 这里有没有问题？如果inode被替换出内存了呢？
     return fd;
 }
-int VFS::close(int fd)
+int VFS::close(FileFd fd)
 {
+
+    User &u = VirtualProcess::Instance()->getUser();
+
+    /* 获取打开文件控制块File结构 */
+    File *pFile = u.u_ofiles.GetF(fd);
+    if (NULL == pFile)
+    {
+        return ERROR_CLOSE_FAIL;
+    }
+
+    /* 释放打开文件描述符fd，递减File结构引用计数 */
+    u.u_ofiles.SetF(fd, NULL);
+    Kernel::instance()->m_OpenFileTable.CloseF(pFile);
     return OK;
 }
+
+/**
+ * 从文件fd中读出length字节放到content缓冲区中。
+ * 返回读出的字节数，如果fd剩下的字节小于length，则只把剩下的读出
+ */
 int VFS::read(int fd, u_int8_t *content, int length)
 {
-    return OK;
+    //分析：length可能大于、小于、等于盘块的整数倍
+    int readByteCount = 0;
+
+    User &u = VirtualProcess::Instance()->getUser();
+    File *p_file = u.u_ofiles.GetF(fd);
+    Inode *p_inode = inodeCache->getInodeByID(p_file->f_inode_id);
+    p_inode->i_flag |= Inode::IUPD;
+    Buf *pBuf;
+
+    if (length > p_inode->i_size)
+    {
+        length = p_inode->i_size;
+    }
+
+    while (readByteCount < length && p_file->f_offset <= p_inode->i_size) //NOTE 这里是<还是<=再考虑一下
+    {
+        BlkNum logicBlkno = p_file->f_offset / DISK_BLOCK_SIZE; //逻辑盘块号
+        BlkNum phyBlkno = p_inode->Bmap(logicBlkno);            //物理盘块号
+        int offsetInBlock = p_file->f_offset % DISK_BLOCK_SIZE; //块内偏移
+        pBuf = Kernel::instance()->getBufferCache().Bread(phyBlkno);
+        u_int8_t *p_buf_byte = (u_int8_t *)pBuf->b_addr;
+        p_buf_byte += offsetInBlock;
+        if (length - readByteCount <= DISK_BLOCK_SIZE - offsetInBlock + 1)
+        { //要读大小<=当前盘块剩下的,读需要的大小
+
+            memcpy(content, p_buf_byte, length - readByteCount);
+            p_file->f_offset += length - readByteCount;
+            readByteCount = length;
+            content += length - readByteCount;
+            //修改offset
+        }
+        else
+        { //把剩下的全部读出来
+            memcpy(content, p_buf_byte, DISK_BLOCK_SIZE - offsetInBlock + 1);
+            p_file->f_offset += DISK_BLOCK_SIZE - offsetInBlock + 1;
+            readByteCount += DISK_BLOCK_SIZE - offsetInBlock + 1;
+            content += DISK_BLOCK_SIZE - offsetInBlock + 1;
+            //修改offset
+        }
+        Kernel::instance()->getBufferCache().Brelse(pBuf);
+    }
+
+    return readByteCount;
 }
 int VFS::write(int fd, u_int8_t *content, int length)
 {
-    return OK;
+    //分析：length可能大于、小于、等于盘块的整数倍
+    int writeByteCount = 0;
+
+    User &u = VirtualProcess::Instance()->getUser();
+    File *p_file = u.u_ofiles.GetF(fd);
+    Inode *p_inode = inodeCache->getInodeByID(p_file->f_inode_id);
+    p_inode->i_flag |= Inode::IUPD;
+
+    Buf *pBuf;
+    while (writeByteCount < length && p_file->f_offset <= p_inode->i_size) //NOTE 这里是<还是<=再考虑一下
+    {
+        BlkNum logicBlkno = p_file->f_offset / DISK_BLOCK_SIZE; //逻辑盘块号
+        BlkNum phyBlkno = p_inode->Bmap(logicBlkno);            //物理盘块号
+        int offsetInBlock = p_file->f_offset % DISK_BLOCK_SIZE; //块内偏移
+        //NOTE:可能要先读后写！！！
+        //当写不满一个盘块的时候，就要先读后写
+        if (offsetInBlock == 0 && length - writeByteCount >= DISK_BLOCK_SIZE)
+        {
+
+            //这种情况不需要先读后写
+            pBuf = Kernel::instance()->getBufferCache().GetBlk(phyBlkno);
+        }
+        else
+        {
+            //先读后写
+            pBuf = Kernel::instance()->getBufferCache().Bread(phyBlkno);
+        }
+
+        u_int8_t *p_buf_byte = (u_int8_t *)pBuf->b_addr;
+        p_buf_byte += offsetInBlock;
+        if (length - writeByteCount <= DISK_BLOCK_SIZE - offsetInBlock + 1)
+        { //要读大小<=当前盘块剩下的,读需要的大小
+
+            memcpy(p_buf_byte, content, length - writeByteCount);
+            p_file->f_offset += length - writeByteCount;
+            writeByteCount = length;
+            //修改offset
+        }
+        else
+        { //把剩下的全部读出来
+            memcpy(p_buf_byte, content, DISK_BLOCK_SIZE - offsetInBlock + 1);
+            p_file->f_offset += DISK_BLOCK_SIZE - offsetInBlock + 1;
+            writeByteCount += DISK_BLOCK_SIZE - offsetInBlock + 1;
+
+            //修改offset
+        }
+        Kernel::instance()->getBufferCache().Bdwrite(pBuf);
+    }
+
+    return writeByteCount;
 }
 
 /**
@@ -289,7 +399,13 @@ int VFS::write(int fd, u_int8_t *content, int length)
  */
 bool VFS::eof(FileFd fd)
 {
-    return true;
+    User &u = VirtualProcess::Instance()->getUser();
+    File *p_file = u.u_ofiles.GetF(fd);
+    Inode *p_inode = inodeCache->getInodeByID(p_file->f_inode_id); //TODO错误处理?
+    if (p_file->f_offset == p_inode->i_size)
+        return true;
+    else
+        return false;
 }
 
 void VFS::registerExt2(Ext2 *p_ext2)

@@ -13,6 +13,7 @@ void Ext2::format()
     //1,2,3# inodePool
     // 4~DISK_BLOCK_NUM-1# 放数据
     DiskBlock *diskMemAddr = Kernel::instance()->getDiskDriver().getDiskMemAddr();
+    memset(diskMemAddr, 0, DISK_SIZE);
 
     //①构造一个superBlock结构，写入磁盘中
     SuperBlock tempSuperBlock;
@@ -142,7 +143,8 @@ void Ext2::format()
     *p_directoryEntry = tempDirctoryEntry;
 
     //test:
-    //Kernel::instance()->getDiskDriver().unmount();
+    Kernel::instance()->getDiskDriver().unmount();
+    Kernel::instance()->getDiskDriver().mount();
     //如果格式话成功，将ext2_status置ready
     ext2_status = Ext2_READY;
 }

@@ -1,5 +1,6 @@
 #include "../include/Shell.h"
 #include "../include/VirtualProcess.h"
+#include "../include/Kernel.h"
 
 void Shell::help()
 {
@@ -315,6 +316,7 @@ void Shell::lseek()
  */
 void Shell::cd()
 {
+
     //cd必须带参数
     if (getParamAmount() != 2)
     {
@@ -370,12 +372,17 @@ void Shell::store()
             return;
         }
         DiskBlock tempBuf;
+        int file_size = 0;
         while (!feof(fd_src))
         {
             //int blkCount = 0;
-            fread(&tempBuf, DISK_BLOCK_SIZE, 1, fd_src);
-            bounded_VFS->write(fd_des, (u_int8_t *)&tempBuf, DISK_BLOCK_SIZE);
+            int readsize = fread(&tempBuf, 1, DISK_BLOCK_SIZE, fd_src);
+            file_size += readsize;
+            bounded_VFS->write(fd_des, (u_int8_t *)&tempBuf, readsize);
         }
+        Inode *p_desInode = Kernel::instance()->getInodeCache().getInodeByID(desInodeId);
+        p_desInode->i_size = file_size; //TODO这一块不太好，封装性差了点
+
         //Step4：关闭文件
         fclose(fd_src);
         bounded_VFS->close(fd_des);
@@ -417,8 +424,8 @@ void Shell::withdraw()
         while (!bounded_VFS->eof(fd_src))
         {
             //int blkCount = 0;
-            bounded_VFS->read(fd_src, (u_int8_t *)&tempBuf, DISK_BLOCK_SIZE);
-            fread(&tempBuf, DISK_BLOCK_SIZE, 1, fd_des);
+            int writesize = bounded_VFS->read(fd_src, (u_int8_t *)&tempBuf, DISK_BLOCK_SIZE);
+            fwrite(&tempBuf, 1, writesize, fd_des);
         }
         //Step4：关闭文件
         fclose(fd_des);

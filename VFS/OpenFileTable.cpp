@@ -41,28 +41,21 @@ File *OpenFileTable::FAlloc()
 
 void OpenFileTable::CloseF(File *pFile)
 {
-    // Inode *pNode;
-    // ProcessManager &procMgr = Kernel::Instance().GetProcessManager();
+    Inode *pNode;
+    //ProcessManager &procMgr = Kernel::Instance().GetProcessManager();
 
-    // /* 管道类型 */
-    // if (pFile->f_flag & File::FPIPE)
-    // {
-    //     pNode = pFile->f_inode;
-    //     pNode->i_mode &= ~(Inode::IREAD | Inode::IWRITE);
-    //     procMgr.WakeUpAll((unsigned long)(pNode + 1));
-    //     procMgr.WakeUpAll((unsigned long)(pNode + 2));
-    // }
+    if (pFile->f_count <= 1)
+    {
+        /*
+    	 * 如果当前进程是最后一个引用该文件的进程，
+    	 * 对特殊块设备、字符设备文件调用相应的关闭函数
+    	 */
+        // pFile->f_inode->CloseI(pFile->f_flag & File::FWRITE);
+        // g_InodeTable.IPut(pFile->f_inode);
+        pFile->f_inode_id = 0;
+        pFile->f_offset = 0;
+    }
 
-    // if (pFile->f_count <= 1)
-    // {
-    //     /*
-    // 	 * 如果当前进程是最后一个引用该文件的进程，
-    // 	 * 对特殊块设备、字符设备文件调用相应的关闭函数
-    // 	 */
-    //     pFile->f_inode->CloseI(pFile->f_flag & File::FWRITE);
-    //     g_InodeTable.IPut(pFile->f_inode);
-    // }
-
-    // /* 引用当前File的进程数减1 */
-    // pFile->f_count--;
+    /* 引用当前File的进程数减1 */
+    pFile->f_count--;
 }
