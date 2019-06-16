@@ -144,8 +144,8 @@ void Ext2::format()
     *p_directoryEntry = tempDirctoryEntry;
 
     //test:
-    Kernel::instance()->getDiskDriver().unmount();
-    Kernel::instance()->getDiskDriver().mount();
+    p_bufferCache->unmount();
+    p_bufferCache->mount();
     //如果格式话成功，将ext2_status置ready
     ext2_status = Ext2_READY;
 }

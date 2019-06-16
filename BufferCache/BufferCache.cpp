@@ -36,31 +36,14 @@ void BufferCache::initialize()
         bp->b_dev = -1;
         bp->b_addr = &Buffer[i];
         /* 初始化NODEV队列 */
-        bp->b_back = &(this->bFreeList);
-        bp->b_forw = this->bFreeList.b_forw;
-        this->bFreeList.b_forw->b_back = bp;
-        this->bFreeList.b_forw = bp;
+        //bp->b_back = &(this->bFreeList);
+        //bp->b_forw = this->bFreeList.b_forw;
+        //this->bFreeList.b_forw->b_back = bp;
+        //this->bFreeList.b_forw = bp;
         /* 初始化自由队列 */
         bp->b_flags = Buf::B_BUSY;
         Brelse(bp); //放入自有缓存队列
     }
-}
-
-/**
- * 将一个缓存控制块放到自有缓存队列中，
- * 注意以下操作并没有清除B_DELWRI、B_WRITE、B_READ、B_DONE标志
- * B_DELWRI表示虽然将该控制块释放到自由队列里面，但是有可能还没有些到磁盘上。
- * B_DONE则是指该缓存的内容正确地反映了存储在或应存储在磁盘上的信息 
- */
-void BufferCache::Brelse(Buf *bp)
-{
-
-    bp->b_flags &= ~(Buf::B_WANTED | Buf::B_BUSY | Buf::B_ASYNC); //消除这些位的符号（这里其实没用到）
-    (this->bFreeList.av_back)->av_forw = bp;
-    bp->av_back = this->bFreeList.av_back;
-    bp->av_forw = &(this->bFreeList);
-    this->bFreeList.av_back = bp;
-    return;
 }
 
 /**
@@ -83,6 +66,7 @@ Buf *BufferCache::Bread(int blkno)
     bp->b_wcount = DISK_BLOCK_SIZE;
     diskDriver->readBlk(blkno, bp->b_addr);
     bp->b_flags |= Buf::B_DONE;
+
     return bp;
 }
 
@@ -101,19 +85,21 @@ void BufferCache::Bwrite(Buf *bp)
 
     if ((flags & Buf::B_DELWRI) == 0)
     {
-        /* 
-	 * 如果不是延迟写，则检查错误；否则不检查。
-	 * 这是因为如果延迟写，则很有可能当前进程不是
-	 * 操作这一缓存块的进程，而在GetError()主要是
-	 * 给当前进程附上错误标志。
-	 */
+        /*
+     * 如果不是延迟写，则检查错误；否则不检查。
+     * 这是因为如果延迟写，则很有可能当前进程不是
+     * 操作这一缓存块的进程，而在GetError()主要是
+     * 给当前进程附上错误标志。
+     */
         Logcat::log("BufferCache", "bwrite出错！");
     }
     else
     {
         diskDriver->writeBlk(bp->b_blkno, *bp->b_addr);
         bp->b_flags |= Buf::B_DONE;
+        std::cout << bp->b_blkno << std::endl;
     }
+
     return;
 }
 
@@ -135,7 +121,7 @@ void BufferCache::Bflush()
 {
     Buf *bp;
 
-    for (bp = this->bFreeList.av_forw; bp != &(this->bFreeList); bp = bp->av_forw)
+    for (bp = this->bFreeList.b_forw; bp != &(this->bFreeList); bp = bp->b_forw)
     {
         /* 找出自由队列中所有延迟写的块 */
         if ((bp->b_flags & Buf::B_DELWRI))
@@ -144,7 +130,7 @@ void BufferCache::Bflush()
             //this->NotAvail(bp);
             this->Bwrite(bp);
             //this->Brelse(bp);
-            std::cout << bp->b_blkno << std::endl;
+            //std::cout << bp->b_blkno << std::endl;
         }
     }
 
@@ -191,12 +177,18 @@ Buf *BufferCache::GetBlk(int blkno)
     }
     /* 注意: 这里清除了所有其他位，只设了B_BUSY */
     bp->b_flags = Buf::B_BUSY; //若有延迟写bit，也一并消除了
-    if (blkno > 1000000)
-    {
-        printf("看看你是什么妖精");
-    }
     bp->b_blkno = blkno;
     memset(bp->b_addr, 0, DISK_BLOCK_SIZE);
+    if (bp->b_dev != devno)
+    {
+        //加入设备缓存队列
+        bp->b_back = &(this->bFreeList);
+        bp->b_forw = this->bFreeList.b_forw;
+        this->bFreeList.b_forw->b_back = bp;
+        this->bFreeList.b_forw = bp;
+        bp->b_dev = devno;
+    }
+
     return bp;
 }
 
@@ -208,6 +200,7 @@ Buf &BufferCache::GetBFreeList()
     return this->bFreeList;
 }
 
+//TODO 这里有bug
 void BufferCache::NotAvail(Buf *bp)
 {
 
@@ -216,5 +209,22 @@ void BufferCache::NotAvail(Buf *bp)
     bp->av_forw->av_back = bp->av_back;
     /* 设置B_BUSY标志 */
     bp->b_flags |= Buf::B_BUSY;
+    return;
+}
+
+/**
+ * 将一个缓存控制块放到自有缓存队列中，
+ * 注意以下操作并没有清除B_DELWRI、B_WRITE、B_READ、B_DONE标志
+ * B_DELWRI表示虽然将该控制块释放到自由队列里面，但是有可能还没有些到磁盘上。
+ * B_DONE则是指该缓存的内容正确地反映了存储在或应存储在磁盘上的信息 
+ */
+void BufferCache::Brelse(Buf *bp)
+{
+
+    bp->b_flags &= ~(Buf::B_WANTED | Buf::B_BUSY | Buf::B_ASYNC); //消除这些位的符号（这里其实没用到）
+    (this->bFreeList.av_back)->av_forw = bp;
+    bp->av_back = this->bFreeList.av_back;
+    bp->av_forw = &(this->bFreeList);
+    this->bFreeList.av_back = bp;
     return;
 }

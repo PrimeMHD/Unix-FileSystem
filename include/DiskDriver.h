@@ -3,7 +3,7 @@
 #include "define.h"
 #include "DiskBlock.h"
 #include "DiskInode.h"
-
+const int devno = 12;
 #define DEF_MODE S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
 /**
  * DiskDriver类：
