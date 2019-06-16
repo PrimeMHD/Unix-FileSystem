@@ -1,6 +1,6 @@
 #ifndef OS_MAIN_DEFINE //确保不重复编译
 #define OS_MAIN_DEFINE
-#define IS_DEBUG //调试状态
+//#define IS_DEBUG //调试状态
 
 #include <iostream>   //大家都懂
 #include <cstring>    //用到str函数
@@ -41,6 +41,7 @@
 #define ERROR_FILENAME_EXSIST -11
 #define ERROR_CLOSE_FAIL -12
 #define ERROR_OUTOF_BLOCK -13
+#define ERROR_DELETE_FAIL -14
 
 typedef int FileFd;  //文件句柄，实际上就是一个int
 typedef int InodeId; //inode号，实际上是一个int
@@ -64,9 +65,10 @@ enum INSTRUCT
     EXIT,
     VERSION,
     STORE,
-    WITHDRAW
+    WITHDRAW,
+    RMDIR
 };
-const int INST_NUM = 15;
+const int INST_NUM = 16;
 //NOTE 注意，如果改了上面的枚举类型，那么下面的这个数字也需要相应修改
 
 static const char *instructStr[]{
@@ -84,7 +86,8 @@ static const char *instructStr[]{
     "exit",
     "version",
     "store",
-    "withdraw"};
+    "withdraw",
+    "rmdir"};
 enum FileType
 {
     NORMAL_FILE,

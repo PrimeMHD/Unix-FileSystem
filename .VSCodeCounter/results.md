@@ -1,55 +1,55 @@
 # /home/mi/Documents/Projects/CProject/Unix-FileSystem
 
-Date : 2019-06-15 20:41:52
+Date : 2019-06-16 11:55:22
 
-Total : 55 files,  2624 codes, 803 comments, 462 blanks, all 3889 lines
+Total : 55 files,  2930 codes, 795 comments, 513 blanks, all 4238 lines
 
 ## Languages
 | language | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| C++ | 52 | 2,470 | 802 | 366 | 3,638 |
-| Markdown | 2 | 147 | 0 | 93 | 240 |
+| C++ | 52 | 2,760 | 794 | 408 | 3,962 |
+| Markdown | 2 | 163 | 0 | 102 | 265 |
 | Makefile | 1 | 7 | 1 | 3 | 11 |
 
 ## Directories
 | path | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| . | 55 | 2,624 | 803 | 462 | 3,889 |
-| BufferCache | 3 | 130 | 60 | 28 | 218 |
+| . | 55 | 2,930 | 795 | 513 | 4,238 |
+| BufferCache | 3 | 134 | 60 | 28 | 222 |
 | DiskDriver | 2 | 84 | 27 | 8 | 119 |
-| Ext2 | 5 | 409 | 108 | 45 | 562 |
-| Shell | 1 | 322 | 89 | 35 | 446 |
+| Ext2 | 5 | 412 | 107 | 45 | 564 |
+| Shell | 1 | 340 | 119 | 43 | 502 |
 | Utils | 3 | 208 | 23 | 15 | 246 |
-| VFS | 8 | 535 | 284 | 96 | 915 |
+| VFS | 8 | 799 | 239 | 130 | 1,168 |
 | VirtualProcess | 3 | 69 | 6 | 13 | 88 |
-| include | 26 | 698 | 204 | 121 | 1,023 |
+| include | 26 | 699 | 212 | 121 | 1,032 |
 
 ## Files
 | filename | language | code | comment | blank | total |
 | :--- | :--- | ---: | ---: | ---: | ---: |
 | [BufferCache/Buf.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/BufferCache/Buf.cpp) | C++ | 1 | 1 | 0 | 2 |
-| [BufferCache/BufferCache.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/BufferCache/BufferCache.cpp) | C++ | 129 | 59 | 27 | 215 |
+| [BufferCache/BufferCache.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/BufferCache/BufferCache.cpp) | C++ | 133 | 59 | 27 | 219 |
 | [BufferCache/BufferLruList.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/BufferCache/BufferLruList.cpp) | C++ | 0 | 0 | 1 | 1 |
 | [DiskDriver/DiskBlock.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/DiskDriver/DiskBlock.cpp) | C++ | 1 | 0 | 0 | 1 |
 | [DiskDriver/DiskDriver.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/DiskDriver/DiskDriver.cpp) | C++ | 83 | 27 | 8 | 118 |
 | [Ext2/DiskInode.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/Ext2/DiskInode.cpp) | C++ | 35 | 14 | 3 | 52 |
-| [Ext2/Ext2.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/Ext2/Ext2.cpp) | C++ | 245 | 61 | 28 | 334 |
+| [Ext2/Ext2.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/Ext2/Ext2.cpp) | C++ | 248 | 60 | 28 | 336 |
 | [Ext2/InodePool.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/Ext2/InodePool.cpp) | C++ | 23 | 19 | 5 | 47 |
 | [Ext2/Path.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/Ext2/Path.cpp) | C++ | 58 | 0 | 3 | 61 |
 | [Ext2/SuperBlock.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/Ext2/SuperBlock.cpp) | C++ | 48 | 14 | 6 | 68 |
 | [README.md](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/README.md) | Markdown | 1 | 0 | 0 | 1 |
-| [Shell/Shell.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/Shell/Shell.cpp) | C++ | 322 | 89 | 35 | 446 |
+| [Shell/Shell.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/Shell/Shell.cpp) | C++ | 340 | 119 | 43 | 502 |
 | [Utils/Bitmap.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/Utils/Bitmap.cpp) | C++ | 180 | 23 | 9 | 212 |
 | [Utils/Logcat.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/Utils/Logcat.cpp) | C++ | 21 | 0 | 4 | 25 |
 | [Utils/TimeHelper.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/Utils/TimeHelper.cpp) | C++ | 7 | 0 | 2 | 9 |
-| [VFS/DirectoryCache.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/VFS/DirectoryCache.cpp) | C++ | 7 | 3 | 1 | 11 |
+| [VFS/DirectoryCache.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/VFS/DirectoryCache.cpp) | C++ | 8 | 3 | 1 | 12 |
 | [VFS/DirectoryEntry.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/VFS/DirectoryEntry.cpp) | C++ | 8 | 6 | 3 | 17 |
 | [VFS/File.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/VFS/File.cpp) | C++ | 62 | 16 | 16 | 94 |
-| [VFS/Inode.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/VFS/Inode.cpp) | C++ | 45 | 128 | 16 | 189 |
+| [VFS/Inode.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/VFS/Inode.cpp) | C++ | 120 | 64 | 19 | 203 |
 | [VFS/InodeCache.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/VFS/InodeCache.cpp) | C++ | 70 | 39 | 13 | 122 |
-| [VFS/OpenFileTable.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/VFS/OpenFileTable.cpp) | C++ | 27 | 32 | 9 | 68 |
+| [VFS/OpenFileTable.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/VFS/OpenFileTable.cpp) | C++ | 34 | 19 | 8 | 61 |
 | [VFS/SuperBlockCache.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/VFS/SuperBlockCache.cpp) | C++ | 67 | 10 | 9 | 86 |
-| [VFS/VFS.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/VFS/VFS.cpp) | C++ | 249 | 50 | 29 | 328 |
+| [VFS/VFS.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/VFS/VFS.cpp) | C++ | 430 | 82 | 61 | 573 |
 | [VirtualProcess/Kernel.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/VirtualProcess/Kernel.cpp) | C++ | 42 | 0 | 6 | 48 |
 | [VirtualProcess/User.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/VirtualProcess/User.cpp) | C++ | 1 | 0 | 1 | 2 |
 | [VirtualProcess/VirtualProcess.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/VirtualProcess/VirtualProcess.cpp) | C++ | 26 | 6 | 6 | 38 |
@@ -71,14 +71,14 @@ Total : 55 files,  2624 codes, 803 comments, 462 blanks, all 3889 lines
 | [include/Logcat.h](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/include/Logcat.h) | C++ | 17 | 0 | 2 | 19 |
 | [include/OpenFileTable.h](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/include/OpenFileTable.h) | C++ | 17 | 19 | 5 | 41 |
 | [include/Path.h](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/include/Path.h) | C++ | 19 | 5 | 2 | 26 |
-| [include/Shell.h](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/include/Shell.h) | C++ | 52 | 5 | 4 | 61 |
+| [include/Shell.h](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/include/Shell.h) | C++ | 47 | 13 | 4 | 64 |
 | [include/SuperBlock.h](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/include/SuperBlock.h) | C++ | 23 | 9 | 3 | 35 |
 | [include/SuperBlockCache.h](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/include/SuperBlockCache.h) | C++ | 25 | 1 | 4 | 30 |
 | [include/TimeHelper.h](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/include/TimeHelper.h) | C++ | 9 | 0 | 3 | 12 |
 | [include/User.h](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/include/User.h) | C++ | 22 | 13 | 6 | 41 |
-| [include/VFS.h](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/include/VFS.h) | C++ | 39 | 1 | 3 | 43 |
+| [include/VFS.h](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/include/VFS.h) | C++ | 42 | 1 | 3 | 46 |
 | [include/VirtualProcess.h](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/include/VirtualProcess.h) | C++ | 18 | 15 | 11 | 44 |
-| [include/define.h](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/include/define.h) | C++ | 84 | 8 | 8 | 100 |
+| [include/define.h](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/include/define.h) | C++ | 87 | 8 | 8 | 103 |
 | [main.cpp](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/main.cpp) | C++ | 15 | 1 | 5 | 21 |
 | [makefile](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/makefile) | Makefile | 7 | 1 | 3 | 11 |
-| [工程笔记.md](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/%E5%B7%A5%E7%A8%8B%E7%AC%94%E8%AE%B0.md) | Markdown | 146 | 0 | 93 | 239 |
+| [工程笔记.md](file:///home/mi/Documents/Projects/CProject/Unix-FileSystem/%E5%B7%A5%E7%A8%8B%E7%AC%94%E8%AE%B0.md) | Markdown | 162 | 0 | 102 | 264 |

@@ -153,6 +153,145 @@ InodeId VFS::createFile(const char *fileName)
 
     return newFileInode;
 }
+
+InodeId VFS::deleteDir(const char *dirName)
+{
+    //目录文件和普通文件要分别处理！
+    Path path(dirName);
+    InodeId deleteFileInode = p_ext2->locateInode(path);
+    if (deleteFileInode < 0)
+    {
+        return deleteFileInode;
+    }
+
+    Inode *p_delete_inode = inodeCache->getInodeByID(deleteFileInode);
+    Inode *p_dirInode = inodeCache->getInodeByID(p_ext2->locateDir(path));
+    if ((p_delete_inode->i_mode & Inode::IFMT) == Inode::IFDIR) //目录文件
+    {
+        //递归删除该目录下的所有文件
+        int blkno = p_delete_inode->Bmap(0); //Bmap查物理块号
+        Buf *pBuf;
+        pBuf = Kernel::instance()->getBufferCache().Bread(blkno);
+        DirectoryEntry *p_directoryEntry = (DirectoryEntry *)pBuf->b_addr;
+
+        int de_i;
+        for (de_i = 0; de_i < DISK_BLOCK_SIZE / sizeof(DirectoryEntry); de_i++)
+        {
+            if ((p_directoryEntry->m_ino != 0)) //找到目录文件中可以见缝插针的地方，填入县创建的inode信息
+            {
+                if (!strcmp(p_directoryEntry->m_name, ".") || !strcmp(p_directoryEntry->m_name, ".."))
+                {
+                    continue;
+                }
+                else
+                {
+                    if ((inodeCache->getInodeByID(p_directoryEntry->m_ino)->i_mode & Inode::IFMT) == Inode::IFDIR)
+                    {
+                        deleteDir(p_directoryEntry->m_name);
+                    }
+                    else
+                    {
+                        deleteFile(p_directoryEntry->m_name);
+                    }
+                }
+
+            } //ino==0表示该文件被删除
+
+            p_directoryEntry++;
+        }
+        Kernel::instance()->getBufferCache().Bdwrite(pBuf);
+        //删除该目录本身
+        deleteDirect(dirName);
+    }
+    else
+    {
+        Logcat::log("非法删除!");
+        return ERROR_DELETE_FAIL;
+    }
+    return deleteFileInode;
+}
+
+/**
+ * 删除文件
+ */
+InodeId VFS::deleteFile(const char *fileName)
+{
+
+    //目录文件和普通文件要分别处理！
+    Path path(fileName);
+    InodeId deleteFileInode = p_ext2->locateInode(path);
+    if (deleteFileInode < 0)
+    {
+        return deleteFileInode;
+    }
+    Inode *p_delete_inode = inodeCache->getInodeByID(deleteFileInode);
+    Inode *p_dirInode = inodeCache->getInodeByID(p_ext2->locateDir(path));
+    if ((p_delete_inode->i_mode & Inode::IFMT) == 0) //普通文件
+    {
+
+        return deleteDirect(fileName);
+    }
+    else
+    {
+        Logcat::log("非法删除!");
+        return ERROR_DELETE_FAIL;
+    }
+}
+
+/**
+ * 直接删除
+ */
+InodeId VFS::deleteDirect(const char *fileName)
+{
+
+    Path path(fileName);
+    InodeId deleteFileInode = p_ext2->locateInode(path);
+    if (deleteFileInode < 0)
+    {
+        return ERROR_DELETE_FAIL;
+    }
+
+    Inode *p_delete_inode = inodeCache->getInodeByID(deleteFileInode);
+    Inode *p_dirInode = inodeCache->getInodeByID(p_ext2->locateDir(path));
+
+    BlkNum phyno;
+    //Step1 释放盘块
+    for (int lbn = 0; (phyno = p_delete_inode->Bmap(lbn)) <= 0; lbn++)
+    {
+        superBlockCache->bfree(phyno);
+    }
+    //Step2 删除目录项
+    int dirblkno = p_dirInode->Bmap(0); //Bmap查物理块号
+    Buf *pBuf;
+    pBuf = Kernel::instance()->getBufferCache().Bread(dirblkno);
+    DirectoryEntry *p_directoryEntry = (DirectoryEntry *)pBuf->b_addr;
+
+    int de_i;
+    for (de_i = 0; de_i < DISK_BLOCK_SIZE / sizeof(DirectoryEntry); de_i++)
+    {
+        if ((p_directoryEntry->m_ino == p_delete_inode->i_number)) //找到目录文件中可以见缝插针的地方，填入县创建的inode信息
+        {
+
+            p_directoryEntry->m_ino = 0;
+            break;
+        } //ino==0表示该文件被删除
+
+        p_directoryEntry++;
+    }
+    if (de_i == DISK_BLOCK_SIZE / sizeof(DirectoryEntry))
+    {
+        return ERROR_DELETE_FAIL;
+    }
+    Kernel::instance()->getBufferCache().Bdwrite(pBuf);
+    //Step3 释放inode
+    p_delete_inode->i_flag = 0; //这里是为了不再把删除的inode刷回，只用在superblock中标记inode删除即可
+    superBlockCache->ifree(deleteFileInode);
+    return deleteFileInode;
+}
+
+/**
+ * 创建目录
+ */
 int VFS::mkDir(const char *dirName)
 {
     int newDirInodeId = createFile(dirName);
@@ -184,9 +323,22 @@ int VFS::mkDir(const char *dirName)
 int VFS::cd(const char *dirName)
 {
     Path path(dirName);
-    VirtualProcess::Instance()->getUser().curDirInodeId = p_ext2->locateInode(path);
+    InodeId targetInodeId = p_ext2->locateInode(path);
+    if (targetInodeId <= 0)
+    {
+        Logcat::log("目录查找失败！");
+    }
+    else if ((inodeCache->getInodeByID(targetInodeId)->i_mode & Inode::IFMT) != Inode::IFDIR)
+    {
+        Logcat::log("ERROR! cd 命令的参数必须是目录！");
+    }
+    else
+    {
+        VirtualProcess::Instance()->getUser().curDirInodeId = targetInodeId;
+    }
+
     //df
-    return OK;
+    return targetInodeId;
 }
 
 void VFS::ls(InodeId dirInodeID)
@@ -233,8 +385,14 @@ void VFS::ls(const char *dirName)
 
     //没有，则向Ext模块要
     dirInodeId = p_ext2->locateInode(path);
-
-    ls(dirInodeId);
+    if ((inodeCache->getInodeByID(dirInodeId)->i_mode & Inode::IFMT) == Inode::IFDIR)
+    {
+        ls(dirInodeId);
+    }
+    else
+    {
+        Logcat::log("ERROR!ls指令只能对目录");
+    }
 }
 
 /**
@@ -305,9 +463,9 @@ int VFS::read(int fd, u_int8_t *content, int length)
     p_inode->i_flag |= Inode::IUPD;
     Buf *pBuf;
 
-    if (length > p_inode->i_size-p_file->f_offset+1)
+    if (length > p_inode->i_size - p_file->f_offset + 1)
     {
-        length = p_inode->i_size-p_file->f_offset+1;
+        length = p_inode->i_size - p_file->f_offset + 1;
     }
 
     while (readByteCount < length && p_file->f_offset <= p_inode->i_size) //NOTE 这里是<还是<=再考虑一下
@@ -351,10 +509,11 @@ int VFS::write(int fd, u_int8_t *content, int length)
     p_inode->i_flag |= Inode::IUPD;
 
     Buf *pBuf;
-    while (writeByteCount < length ) //NOTE 这里是<还是<=再考虑一下
+    while (writeByteCount < length) //NOTE 这里是<还是<=再考虑一下
     {
         BlkNum logicBlkno = p_file->f_offset / DISK_BLOCK_SIZE; //逻辑盘块号
-        if(logicBlkno==1030){
+        if (logicBlkno == 1030)
+        {
             printf("暂时停下");
         }
         BlkNum phyBlkno = p_inode->Bmap(logicBlkno);            //物理盘块号
@@ -405,7 +564,7 @@ bool VFS::eof(FileFd fd)
     User &u = VirtualProcess::Instance()->getUser();
     File *p_file = u.u_ofiles.GetF(fd);
     Inode *p_inode = inodeCache->getInodeByID(p_file->f_inode_id); //TODO错误处理?
-    if (p_file->f_offset == p_inode->i_size+1)
+    if (p_file->f_offset == p_inode->i_size + 1)
         return true;
     else
         return false;

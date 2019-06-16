@@ -1,1 +1,50 @@
-THIS IS HELP FILE
+支持的用户指令有：
+【mount】
+功能：挂载磁盘
+用法：mount
+说明：任何一次程序执行，必须先执行mount!!!
+【unmount】
+功能：卸载磁盘
+用法：unmount
+说明：退出程序时可以手动执行，也可以由exit指令自动unmount
+【format】
+功能：格式化磁盘
+用法：format
+说明：一块虚拟磁盘disk.img只用执行一次
+【mkdir】
+功能：创建目录
+用法：mkdir dirname
+说明：目前仅支持在当前目录创建子目录，若有重名创建失败
+【touch】
+功能：创建新文件
+用法：touch filename
+说明：目前仅支持在当前目录创建新文件，若有重名创建失败
+【rm】
+功能：删除文件
+用法：rm filename
+说明：目前仅支持删除当前目录下的文件，注意要删除目录请使用rmdir
+【rmdir】
+功能：删除目录，递归删除该目录下的所有子目录、文件
+用法：rmdir dirname
+说明：删除文件请使用rmdir
+【help】
+功能：显示帮助信息
+用法：help
+【version】
+功能：显示作品信息
+用法：version
+【man】
+功能：显示命令使用说明（man暂未支持）
+用法：man
+【exit】
+功能：退出程序
+用法：exit
+说明：会自动卸载磁盘
+【ls】
+功能：显示目录下的所有文件
+用法：ls path
+说明：path必须是目录的路径，支持相对地址和绝对地址
+cd();
+store();
+withdraw();
+clear();

@@ -10,11 +10,14 @@ void Shell::help()
 
 int Shell::readUserInput()
 {
-
+    Logcat::log("建议先输入help指令，查看使用说明");
     while (true)
     {
         //Step0:
         //显示命令提示符
+
+        putchar('$');
+        putchar(' ');
         //TODO
 
         //Step1:获取用户输入放到缓冲区
@@ -56,6 +59,7 @@ int Shell::readUserInput()
         //Step4:解析执行指令
         parseCmd();
         delete dupl_tty_buffer;
+        fflush(stdin);
     }
 }
 
@@ -79,34 +83,37 @@ void Shell::parseCmd()
         ls(); //OK
         break;
     case RM:
-        // rm();
+        rm(); //OK
+        break;
+    case RMDIR:
+        rmdir(); //OK
         break;
     case MKDIR:
-        mkdir();
+        mkdir(); //OK
         break;
     case TOUCH:
         touch(); //OK
         break;
     case CLEAR:
-        //clear();
+        clear(); //OK
         break;
     case HELP:
-        help();
+        help(); //OK
         break;
     case EXIT:
-        mexit();
+        mexit(); //OK
         break;
     case VERSION:
-        version();
+        version(); //OK
         break;
     case STORE:
-        store();
+        store(); //OK
         break;
     case WITHDRAW:
-        withdraw();
+        withdraw(); //OKKK
         break;
     default:
-        printf("CMD NOT SUPPORTED!\n");
+        Logcat::log("CMD NOT SUPPORTED!\n");
         break;
     }
 }
@@ -173,7 +180,7 @@ int Shell::getParamAmount()
 
 void Shell::mount()
 {
-    Logcat::log(TAG, "MOUNT EXEC");
+    Logcat::devlog(TAG, "MOUNT EXEC");
     /**
      * 装载磁盘的最上层命令调用函数：
      * 硬盘装载的步骤：
@@ -188,7 +195,7 @@ void Shell::mount()
 void Shell::unmount()
 {
     bounded_VFS->unmount();
-    Logcat::log(TAG, "unmount EXEC");
+    Logcat::devlog(TAG, "unmount EXEC");
 }
 
 /**
@@ -200,7 +207,7 @@ void Shell::format()
     if (bounded_VFS->isMounted())
     {
         bounded_VFS->format();
-        Logcat::log(TAG, "format EXEC");
+        Logcat::devlog(TAG, "format EXEC");
     }
     else
     {
@@ -225,7 +232,7 @@ void Shell::mkdir()
 void Shell::cat()
 {
     Logcat::devlog(TAG, "cat EXEC");
-    Logcat::devlog(TAG, "cat 暂不支持");
+    Logcat::log("cat 暂不支持");
 }
 void Shell::touch()
 {
@@ -242,7 +249,49 @@ void Shell::touch()
         }
     }
 
-    Logcat::log(TAG, "touch EXEC");
+    Logcat::devlog(TAG, "touch EXEC");
+}
+
+/**
+ * 删除文件
+ */
+void Shell::rm()
+{
+    if (getParamAmount() != 2)
+    {
+        Logcat::log("ERROR!参数个数错误！");
+        return;
+    }
+    else
+    {
+        if (0 > bounded_VFS->deleteFile(getParam(1)))
+        {
+            Logcat::log("删除文件失败！");
+        }
+    }
+
+    Logcat::devlog(TAG, "rm EXEC");
+}
+
+/**
+ * 删除目录以及其下的所有文件
+ */
+void Shell::rmdir()
+{
+    if (getParamAmount() != 2)
+    {
+        Logcat::log("ERROR!参数个数错误！");
+        return;
+    }
+    else
+    {
+        if (0 > bounded_VFS->deleteDir(getParam(1)))
+        {
+            Logcat::log("删除，目录失败！");
+        }
+    }
+
+    Logcat::devlog(TAG, "rmdir EXEC");
 }
 
 void Shell::version()
@@ -252,7 +301,9 @@ void Shell::version()
 }
 void Shell::man()
 {
-    Logcat::log(TAG, "man EXEC");
+    Logcat::log(TAG, "欢迎求助那个男人");
+
+    Logcat::devlog(TAG, "man EXEC");
 }
 void Shell::mexit()
 {
@@ -261,54 +312,8 @@ void Shell::mexit()
         bounded_VFS->unmount();
     }
     Logcat::devlog(TAG, "exit EXEC");
-    Logcat::devlog("程序结束！");
+    Logcat::log("程序结束！");
     exit(OK);
-}
-//隐式调用
-void Shell::creat()
-{
-    Logcat::devlog(TAG, "creat EXEC");
-}
-
-/**
- * 临时的，不应该是一个用户接口
- */
-void Shell::open()
-{
-    Path path(getParam(1));
-    bounded_VFS->open(path, File::FREAD);
-    Logcat::log(TAG, "open EXEC");
-}
-/**
- * 临时的，不应该是一个用户接口
- */
-void Shell::close()
-{
-    Logcat::log(TAG, "close EXEC");
-}
-
-/**
- * 临时的，不应该是一个用户接口
- */
-void Shell::read()
-{
-    Logcat::log(TAG, "read EXEC");
-}
-
-/**
- * 临时的，不应该是一个用户接口
- */
-void Shell::write()
-{
-    Logcat::log(TAG, "write EXEC");
-}
-
-/**
- * 临时的，不应该是一个用户接口
- */
-void Shell::lseek()
-{
-    Logcat::log(TAG, "lseek EXEC");
 }
 
 /**
@@ -320,7 +325,7 @@ void Shell::cd()
     //cd必须带参数
     if (getParamAmount() != 2)
     {
-        printf("Error!cd命令参数个数错误！");
+        Logcat::log("Error!cd命令参数个数错误！");
     }
     else
     {
@@ -437,6 +442,11 @@ void Shell::withdraw()
     }
 }
 
+void Shell::clear()
+{
+    system("clear");
+}
+
 Shell::Shell()
 {
     TAG = strdup("Shell");
@@ -450,3 +460,51 @@ void Shell::setVFS(VFS *vfs)
 {
     bounded_VFS = vfs;
 }
+
+//隐式调用
+
+// void Shell::creat()
+// {
+//     Logcat::devlog(TAG, "creat EXEC");
+// }
+
+/**
+ * 临时的，不应该是一个用户接口
+ */
+// void Shell::open()
+// {
+//     Path path(getParam(1));
+//     bounded_VFS->open(path, File::FREAD);
+//     Logcat::log(TAG, "open EXEC");
+// }
+/**
+ * 临时的，不应该是一个用户接口
+ */
+// void Shell::close()
+// {
+//     Logcat::log(TAG, "close EXEC");
+// }
+
+/**
+ * 临时的，不应该是一个用户接口
+ */
+// void Shell::read()
+// {
+//     Logcat::log(TAG, "read EXEC");
+// }
+
+/**
+ * 临时的，不应该是一个用户接口
+ */
+// void Shell::write()
+// {
+//     Logcat::log(TAG, "write EXEC");
+// }
+
+/**
+ * 临时的，不应该是一个用户接口
+ */
+// void Shell::lseek()
+// {
+//     Logcat::log(TAG, "lseek EXEC");
+// }
