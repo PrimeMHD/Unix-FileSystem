@@ -9,6 +9,7 @@
  */
 void Ext2::format()
 {
+    p_bufferCache->initialize();
     //0# superblock
     //1,2,3# inodePool
     // 4~DISK_BLOCK_NUM-1# 放数据

@@ -42,6 +42,7 @@ void VFS::unmount()
             superBlockCache->flushBack();
         }
         p_ext2->unregisterFs();
+        Mounted = false;
         //刷回磁盘缓存
     }
 }

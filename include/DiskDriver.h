@@ -4,6 +4,7 @@
 #include "DiskBlock.h"
 #include "DiskInode.h"
 
+#define DEF_MODE S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH
 /**
  * DiskDriver类：
  * 操纵linux系统调用。本程序的最底层。

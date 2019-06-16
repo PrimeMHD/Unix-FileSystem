@@ -2,13 +2,15 @@
 #define OS_MAIN_DEFINE
 //#define IS_DEBUG //调试状态
 
-#include <iostream>   //大家都懂
+#include <iostream> //大家都懂
+#include <stdio.h>
 #include <cstring>    //用到str函数
 #include <string>     //沈坚不让用的String类
 #include <stdint.h>   //需要用到比特类型
 #include <fcntl.h>    //open系统调用
 #include <unistd.h>   //lseek函数
 #include <sys/mman.h> //mmap函数
+#include <sys/stat.h> //文件设置权限
 #include <stdlib.h>   //随机数
 #include <time.h>     //随机数种子要用
 

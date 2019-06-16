@@ -5,7 +5,7 @@
             "name": "C++ Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}/ext2_fs",
+            "program": "${workspaceRoot}/user_fs",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceRoot}",
@@ -26,7 +26,7 @@
             "name": "C++ Attach",
             "type": "cppdbg",
             "request": "attach",
-            "program": "${workspaceRoot}/ext2_fs",
+            "program": "${workspaceRoot}/user_fs",
             "processId": "${command:pickProcess}",
             "linux": {
                 "MIMode": "gdb"

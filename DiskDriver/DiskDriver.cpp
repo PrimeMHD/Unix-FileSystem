@@ -24,7 +24,7 @@ int DiskDriver::mount()
 
    int retVal = -1;
    //打开img文件,如果没有就尝试创建
-   DiskFd = open(DISK_IMG_FILEPATH, O_RDWR | O_CREAT, 0);
+   DiskFd = open(DISK_IMG_FILEPATH, O_RDWR | O_CREAT, DEF_MODE);
    if (DiskFd == -1)
    {
       Logcat::log(TAG, "Mount Disk Failed!");
